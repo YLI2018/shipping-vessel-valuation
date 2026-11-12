@@ -30,3 +30,19 @@ def leave_one_out(ages, prices) -> BacktestResult:
         keep = np.arange(p.size) != i
         pred[i] = fit_age_curve(x[keep], p[keep]).value(x[i])
     return BacktestResult(errors=pred / p - 1, predicted=pred)
+
+
+def leave_one_out_formula(formula, data, test_index):
+    """Leave-one-out for a regression formula (used by the hedonic model M1+).
+
+    Each row in test_index is valued by the model re-estimated on all other rows of data; returns the misses
+    e_i = predicted / actual price - 1. Prices are taken back from log price with Duan's smearing factor.
+    """
+    import statsmodels.formula.api as smf
+
+    errors = []
+    for idx in test_index:
+        m = smf.ols(formula, data=data.drop(index=idx)).fit()
+        pred = float(np.exp(m.predict(data.loc[[idx]]).iloc[0]) * np.mean(np.exp(m.resid)))
+        errors.append(pred / data.at[idx, "price_musd"] - 1)
+    return BacktestResult(errors=np.array(errors), predicted=np.array([]))
