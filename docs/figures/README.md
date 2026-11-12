@@ -1,3 +1,3 @@
 # Figures
 
-Charts for the M1 age curve, produced by `examples/run_age_curve.py` (PDF for the technical note, PNG for the GitHub pages).
+Charts produced by `examples/run_age_curve.py` (M1) and `examples/run_hedonic.py` (M1+), as PDF (technical notes) and PNG (GitHub pages).
