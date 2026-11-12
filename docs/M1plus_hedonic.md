@@ -12,8 +12,8 @@ A yes/no feature changes the price by $e^{\beta}-1$; for $\ln(\text{dwt})$, $\be
 
 | | Sales | Market level | Purpose |
 |---|---:|---|---|
-| Model A | 298 tankers and bulkers | ship type × quarter | Measure the feature effects |
-| Model B | 46 MR tankers | quarter | Check on the target's own segment |
+| Model A | 297 tankers and bulkers | ship type × quarter | Measure the feature effects |
+| Model B | 45 MR tankers | quarter | Check on the target's own segment |
 
 ## What moves the price (model A)
 
@@ -21,10 +21,10 @@ A yes/no feature changes the price by $e^{\beta}-1$; for $\ln(\text{dwt})$, $\be
 
 | Feature | Effect on price | Reliable |
 |---|---:|:---:|
-| Built in Japan (vs China) | +21.6% | Yes |
-| Built in Korea (vs China) | +17.4% | Yes |
-| Scrubber fitted | +8.8% | Yes |
-| Special survey due within 12 months | −4.6% | Weak |
+| Built in Japan (vs China) | +21.5% | Yes |
+| Built in Korea (vs China) | +16.9% | Yes |
+| Scrubber fitted | +8.9% | Yes |
+| Special survey due within 12 months | −4.8% | Weak |
 | 1% more deadweight | +0.55% | Yes |
 | Value lost per year of age (tankers) | 7.5% | Yes |
 
@@ -32,11 +32,11 @@ A yes/no feature changes the price by $e^{\beta}-1$; for $\ln(\text{dwt})$, $\be
 
 | | Model A | Model B | M1 age curve |
 |---|---:|---:|---:|
-| **Value** | **US\$29.34m** | US\$26.31m | US\$29.67m |
-| 68% range | 24.73 – 34.80 | 23.69 – 29.23 | 26.78 – 32.87 |
-| Reported sale US\$28.45m vs value | −3.0% | +8.1% | −4.1% |
-| Back-test on 46 MR sales: average miss | 12.1% | 8.7% | 7.5% |
-| Back-test on 46 MR sales: bias | +9.6% | +1.0% | +0.8% |
+| **Value** | **US\$29.22m** | US\$26.29m | US\$29.67m |
+| 68% range | 24.63 – 34.68 | 23.68 – 29.20 | 26.78 – 32.87 |
+| Reported sale US\$28.45m vs value | −2.6% | +8.2% | −4.1% |
+| Back-test on 45 MR sales: average miss | 12.3% | 8.7% | 7.5% |
+| Back-test on 45 MR sales: bias | +9.6% | +1.1% | +0.8% |
 
 ![Back-test](figures/hedonic_backtest.png)
 
@@ -46,7 +46,7 @@ A yes/no feature changes the price by $e^{\beta}-1$; for $\ln(\text{dwt})$, $\be
 
 | Path | Contents |
 |---|---|
-| [`data/sample/hedonic_sales.csv`](../data/sample/hedonic_sales.csv) | 298 anonymised sales (H001–H298): type, age, size, yard country, features, quarter, price |
+| [`data/sample/hedonic_sales.csv`](../data/sample/hedonic_sales.csv) | 297 anonymised sales (H001–H297): type, age, size, yard country, features, quarter, price |
 | [`src/vessel_valuation/models/hedonic.py`](../src/vessel_valuation/models/hedonic.py) | Models A and B, fit, by-hand check, valuation, effects |
 | [`src/vessel_valuation/analytics/backtest.py`](../src/vessel_valuation/analytics/backtest.py) | Leave-one-out back-test (shared with M1) |
 | [`examples/run_hedonic.py`](../examples/run_hedonic.py) | One run, step by step: fit, effects, value term by term, back-test, charts |
