@@ -5,14 +5,14 @@ vessel valuation methods.
 
 ## Project status
 
-Work in progress. The first model, the **M1 vessel age curve**, is published with its code, anonymised data, tests and technical note.
+Work in progress. Two models are published with their code, anonymised data, tests and technical notes: the **M1 vessel age curve** and the **M1+ hedonic price model**.
 
 ## Models
 
 | Model | Question it answers | Status |
 |---|---|---|
 | [M1 Vessel age curve](docs/M1_age_curve.md) | What is a second-hand ship worth, from recent sales of similar ships? | Published |
-| M1+ Hedonic regression | How do size, yard, survey timing and scrubbers move the price beyond age? | In preparation |
+| [M1+ Hedonic price model](docs/M1plus_hedonic.md) | How do size, yard, survey timing and scrubbers move the price beyond age? | Published |
 | Discounted cash flow and others | What is the ship worth from the cash it can earn? | Planned |
 
 ## M1 headline result
@@ -32,6 +32,12 @@ The Python results agree with an independent Excel implementation of the model t
 
 📄 [M1 page](docs/M1_age_curve.md) · [Technical note (PDF)](docs/M1_Age_Curve_Technical_Note.pdf)
 
+## M1+ headline result
+
+On 297 tanker and bulker sales, ships built in Japan sell for **21.5%** and in Korea for **16.9%** more than Chinese-built ships of the same age and size; a scrubber adds **8.9%**. M1+ values Target Ship 1 at US\$29.22m, but its back-test on MR tankers (average miss 12.3%) is weaker than the age curve's (7.5%): **M1 values, M1+ explains.**
+
+📄 [M1+ page](docs/M1plus_hedonic.md) · [Technical note (PDF)](docs/M1plus_Hedonic_Technical_Note.pdf)
+
 ## Research standards
 
 - Traceable data and clearly stated assumptions.
@@ -45,6 +51,7 @@ The Python results agree with an independent Excel implementation of the model t
 ```bash
 python3 -m pip install -r requirements.txt
 python3 examples/run_age_curve.py
+python3 examples/run_hedonic.py
 python3 -m unittest discover -s tests
 ```
 
