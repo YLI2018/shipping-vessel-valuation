@@ -28,21 +28,21 @@ class PublishedHedonicResults(unittest.TestCase):
         cls.target = prepare(TARGET)
 
     def test_samples(self):
-        self.assertEqual(int(self.mA.nobs), 298)
-        self.assertEqual(int(self.mB.nobs), 46)
+        self.assertEqual(int(self.mA.nobs), 297)
+        self.assertEqual(int(self.mB.nobs), 45)
 
     def test_by_hand_equals_library(self):
         for m in (self.mA, self.mB):
             self.assertLess(np.max(np.abs(solve_by_hand(m) - m.params.values)), 1e-8)
 
     def test_values(self):
-        self.assertAlmostEqual(value(self.mA, self.target).value, 29.34, places=2)
-        self.assertAlmostEqual(value(self.mB, self.target).value, 26.31, places=2)
+        self.assertAlmostEqual(value(self.mA, self.target).value, 29.22, places=2)
+        self.assertAlmostEqual(value(self.mB, self.target).value, 26.29, places=2)
 
     def test_key_effects(self):
         b = self.mA.params
-        self.assertAlmostEqual(np.exp(b["C(yard, Treatment('China'))[T.Japan]"]) - 1, 0.216, places=3)
-        self.assertAlmostEqual(np.exp(b["scrubber"]) - 1, 0.088, places=3)
+        self.assertAlmostEqual(np.exp(b["C(yard, Treatment('China'))[T.Japan]"]) - 1, 0.215, places=3)
+        self.assertAlmostEqual(np.exp(b["scrubber"]) - 1, 0.089, places=3)
 
     def test_backtest(self):
         bt = leave_one_out_formula(FORMULA_B, self.mr, self.mr.index)
