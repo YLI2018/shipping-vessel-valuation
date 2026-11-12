@@ -54,7 +54,7 @@
 Author & Yan Li \\
 Case & Target Ship 1, MR product tanker, built 2012 \\
 Valuation date & 22 May 2026 \\
-Version & 1.0 \\
+Version & 1.1 (12 November 2026) \\
 \end{tabular}
 
 \vfill
@@ -62,9 +62,11 @@ Version & 1.0 \\
 \small
 \textbf{Summary.}
 The model values a second-hand ship from recent sales of similar ships. Sale prices are first moved to the valuation date with a broker price benchmark; an exponential depreciation curve is then fitted to price against age by ordinary least squares on log price, and the ship is read off the curve at its own age.
-On 30 MR tanker sales the curve explains 94\% of the variation in log price and implies that value falls by 8.1\% for each additional year of age.
-Target Ship 1, aged 14, is valued at \usd{29.52}m (range \usd{26.43}--32.62m); its reported sale price of \usd{28.45}m lies 3.6\% below the fitted value and inside the range.
-A leave-one-out back-test gives an average absolute error of 6.5\% and a bias of $+0.8\%$.
+Only sales reported on or before the valuation date are used. On 43 MR tanker sales the curve explains 91\% of the variation in log price and implies that value falls by 8.4\% for each additional year of age.
+Target Ship 1, aged 14, is valued at \usd{29.67}m (range \usd{26.27}--33.06m); its reported sale price of \usd{28.45}m lies 4.1\% below the fitted value and inside the range.
+A leave-one-out back-test gives an average absolute error of 7.5\% and a bias of $+0.8\%$.
+
+\textit{Version 1.1 removes hindsight: version 1.0 used 30 sales, four of them reported after the valuation date (value \usd{29.52}m). Earlier broker reports were added instead.}
 \end{minipage}
 \end{titlepage}
 
@@ -119,9 +121,10 @@ Sales are collected from weekly broker sale-and-purchase reports and screened wi
 \item same ship type and size band (MR product tanker);
 \item an exact reported price (indicative prices such as ``low \usd{20}s'' are excluded);
 \item no sale with an attached charter, no resale of a newbuilding contract, no repeated entry;
+\item the sale was reported on or before the valuation date (no information from after that date is used);
 \item the ship being valued is excluded from its own comparables.
 \end{itemize}
-For Target Ship 1 this leaves $n = 30$ sales reported between February and October 2026, aged 5 to 20 years at sale. The data are listed in Appendix~\ref{app:data}.
+For Target Ship 1 this leaves $n = 43$ sales reported between December 2025 and May 2026, aged 5 to 20 years at sale. The data are listed in Appendix~\ref{app:data}.
 
 \subsection{Adjustment to the valuation date}
 
@@ -132,7 +135,7 @@ P_i = P_i^{\text{rep}} \times \frac{B(T,\,k_i)}{B(t_i,\,k_i)},
 \end{equation}
 where $P_i^{\text{rep}}$ is the reported price of sale $i$, $t_i$ its date, and $B(t,k)$ the benchmark price on date $t$ for benchmark age $k \in \{5, 10, 15\}$ years, choosing the benchmark age nearest the ship's age at sale.
 
-\emph{Example.} Sale~04, a 14-year-old ship, was reported at \usd{27.60}m. The 15-year benchmark rose by 11.8\% between its sale date and 22 May 2026, giving an adjusted price of \usd{30.85}m.
+\emph{Example.} Sale~03, a 14-year-old ship, was reported at \usd{27.60}m. The 15-year benchmark rose by 11.8\% between its sale date and 22 May 2026, giving an adjusted price of \usd{30.85}m.
 In what follows, ``price'' means the adjusted price $P_i$.
 
 % ───────────────────────────────────────────────────────────
@@ -238,43 +241,43 @@ The market value of a ship of age $\age_0$ is $V = \hat a\,\hat r^{\,\age_0}$. T
 
 \begin{table}[h]
 \centering
-\caption{Estimation on 30 MR sales.}
+\caption{Estimation on 43 MR sales.}
 \label{tab:est}
 \begin{tabular}{@{}l l r@{}}
 \toprule
 Quantity & Calculation & Value \\
 \midrule
-Number of comparables & & 30 \\
-Mean age & $\overline{\age}$ & 14.967 \\
-Mean log price & $\overline{\ln P}$ & 3.30376 \\
-Cross-product sum & $S_{xy}$ & $-36.4605$ \\
-Sum of squared age deviations & $S_{xx}$ & 432.967 \\
+Number of comparables & & 43 \\
+Mean age & $\overline{\age}$ & 15.163 \\
+Mean log price & $\overline{\ln P}$ & 3.28800 \\
+Cross-product sum & $S_{xy}$ & $-50.1705$ \\
+Sum of squared age deviations & $S_{xx}$ & 571.860 \\
 \midrule
-Slope & $\hat b = S_{xy}/S_{xx}$ & $\mathbf{-0.08421}$ \\
-\quad standard error & & 0.00388 \\
-\quad 95\% confidence interval & & $[-0.0922,\ -0.0763]$ \\
-Intercept & $\hat c = \overline{\ln P} - \hat b\,\overline{\age}$ & \textbf{4.56412} \\
-Level at age zero & $\hat a = e^{\hat c}$ & 95.98 \\
-Annual factor & $\hat r = e^{\hat b}$ & 0.9192 \\
-Annual depreciation & $1 - \hat r$ & \textbf{8.1\%} \\
-\quad 95\% confidence interval & & 7.3\%--8.8\% \\
-Goodness of fit & $R^2 = 1 - 0.18245/3.25283$ & \textbf{0.944} \\
+Slope & $\hat b = S_{xy}/S_{xx}$ & $\mathbf{-0.08773}$ \\
+\quad standard error & & 0.00429 \\
+\quad 95\% confidence interval & & $[-0.0964,\ -0.0791]$ \\
+Intercept & $\hat c = \overline{\ln P} - \hat b\,\overline{\age}$ & \textbf{4.61826} \\
+Level at age zero & $\hat a = e^{\hat c}$ & 101.32 \\
+Annual factor & $\hat r = e^{\hat b}$ & 0.9160 \\
+Annual depreciation & $1 - \hat r$ & \textbf{8.4\%} \\
+\quad 95\% confidence interval & & 7.6\%--9.2\% \\
+Goodness of fit & $R^2 = 1 - 0.43056/4.83213$ & \textbf{0.911} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The fitted curve is
 \[
-\hat P = 95.98 \times 0.9192^{\,\age}.
+\hat P = 101.32 \times 0.9160^{\,\age}.
 \]
-The slope is estimated precisely ($t = -21.7$): with 95\% confidence, value falls by between 7.3\% and 8.8\% per year of age.
+The slope is estimated precisely ($t = -20.5$): with 95\% confidence, value falls by between 7.6\% and 9.2\% per year of age.
 
 \subsection{Valuation}
 
 \[
-\ln V = 4.56412 - 0.08421 \times 14 = 3.38517, \qquad V = e^{3.38517} = \usd{29.52}\text{m},
+\ln V = 4.61826 - 0.08773 \times 14 = 3.39001, \qquad V = e^{3.39001} = \usd{29.67}\text{m},
 \]
-equivalently $95.98 \times 0.9192^{14} = \usd{29.52}$m.
+equivalently $101.32 \times 0.9160^{14} = \usd{29.67}$m.
 
 \begin{table}[h]
 \centering
@@ -284,13 +287,13 @@ equivalently $95.98 \times 0.9192^{14} = \usd{29.52}$m.
 \toprule
 Output & Value \\
 \midrule
-Market value & \textbf{\usd{29.52}m} \\
-Standard deviation of residuals & \usd{3.10}m \\
-Range ($\pm$ 1 SD) & \usd{26.43}m -- \usd{32.62}m \\
-Cross-check: mean of the 5 sales within $\pm$1 year of age 14 & \usd{29.95}m \\
+Market value & \textbf{\usd{29.67}m} \\
+Standard deviation of residuals & \usd{3.40}m \\
+Range ($\pm$ 1 SD) & \usd{26.27}m -- \usd{33.06}m \\
+Cross-check: mean of the 7 sales within $\pm$1 year of age 14 & \usd{30.32}m \\
 \midrule
 Reported sale price & \usd{28.45}m \\
-Reported minus fitted & $-\usd{1.07}$m ($-3.6\%$) \\
+Reported minus fitted & $-\usd{1.22}$m ($-4.1\%$) \\
 Reported price inside the range & Yes \\
 \bottomrule
 \end{tabular}
@@ -299,7 +302,7 @@ Reported price inside the range & Yes \\
 \begin{figure}[h]
 \centering
 \includegraphics[width=\linewidth]{figures/age_curve.pdf}
-\caption{Fitted age curve on 30 MR sales adjusted to 22 May 2026, with the $\pm$1 SD range and Target Ship 1.}
+\caption{Fitted age curve on 43 MR sales adjusted to 22 May 2026, with the $\pm$1 SD range and Target Ship 1.}
 \label{fig:curve}
 \end{figure}
 
@@ -308,14 +311,14 @@ Reported price inside the range & Yes \\
 \label{sec:interp}
 
 \begin{itemize}
-\item \textbf{Value.} On recent MR sales, a 14-year-old MR tanker was worth about \usd{29.5}m on 22 May 2026.
-\item \textbf{The reported price was close to market.} At \usd{28.45}m it is 3.6\% below the curve and well inside the range: neither a distressed sale nor an overpayment.
-\item \textbf{Depreciation of about 8\% per year.} A 15-year-old MR is worth $0.92$ times a 14-year-old, about \usd{27.1}m. Because the loss is proportional, the dollar loss shrinks with age: \usd{2.59}m from age 13 to 14 and \usd{2.38}m from 14 to 15.
-\item \textbf{Age explains 94\% of the variation in log price.} The remaining 6\% reflects yard, size, condition, survey timing, fuel efficiency and deal terms, which this model does not measure.
-\item \textbf{Cross-check.} The five sales closest in age average \usd{29.95}m, within 1.5\% of the curve.
+\item \textbf{Value.} On recent MR sales, a 14-year-old MR tanker was worth about \usd{29.7}m on 22 May 2026.
+\item \textbf{The reported price was close to market.} At \usd{28.45}m it is 4.1\% below the curve and well inside the range: neither a distressed sale nor an overpayment.
+\item \textbf{Depreciation of about 8\% per year.} A 15-year-old MR is worth $0.916$ times a 14-year-old, about \usd{27.2}m. Because the loss is proportional, the dollar loss shrinks with age: \usd{2.72}m from age 13 to 14 and \usd{2.49}m from 14 to 15.
+\item \textbf{Age explains 91\% of the variation in log price.} The remaining 9\% reflects yard, size, condition, survey timing, fuel efficiency and deal terms, which this model does not measure.
+\item \textbf{Cross-check.} The seven sales closest in age average \usd{30.32}m, within 2.2\% of the curve.
 \end{itemize}
 
-\textbf{The level at age zero is not a newbuilding price.} $\hat a = \usd{95.98}$m, whereas a new MR tanker cost about \usd{50}m in May 2026 according to broker newbuilding benchmarks. The youngest comparable is five years old, so the curve below that age extrapolates the 9--20-year trend. $\hat a$ should be read only as the scale constant of \eqref{eq:rform}.
+\textbf{The level at age zero is not a newbuilding price.} $\hat a = \usd{101.32}$m, whereas a new MR tanker cost about \usd{50}m in May 2026 according to broker newbuilding benchmarks. The youngest comparable is five years old, so the curve below that age extrapolates the 9--20-year trend. $\hat a$ should be read only as the scale constant of \eqref{eq:rform}.
 
 \textbf{The annual factor is cross-sectional.} $\hat r$ compares ships of different ages at the same date. It is not a forecast of one ship's price a year later, which also depends on how the market moves.
 
@@ -333,7 +336,7 @@ In a \emph{leave-one-out} back-test each sale is valued by a curve estimated wit
 \item record the error $e_i = \hat P_{(-i)}/P_i - 1$ (positive when the model is too high).
 \end{enumerate}
 
-\emph{Example.} Without Sale~01 (17 years, \usd{23.50}m) the curve is $96.07 \times 0.9191^{\age}$, which gives \usd{22.91}m at age 17: an error of $-2.5\%$.
+\emph{Example.} Without Sale~01 (17 years, \usd{23.50}m) the curve is $101.40 \times 0.9159^{\age}$, which gives \usd{22.78}m at age 17: an error of $-3.1\%$.
 
 \subsection{Error measures}
 
@@ -348,16 +351,16 @@ The average absolute error is the primary measure, since a valuation concerns on
 
 \begin{table}[h]
 \centering
-\caption{Leave-one-out back-test on 30 MR sales.}
+\caption{Leave-one-out back-test on 43 MR sales.}
 \label{tab:bt}
 \begin{tabular}{@{}l r@{}}
 \toprule
 Measure & Result \\
 \midrule
-Average absolute error & \textbf{6.5\%} \\
+Average absolute error & \textbf{7.5\%} \\
 Bias & $+0.8\%$ \\
-Largest error & $+43.7\%$ (Sale 13, age 5) \\
-Average absolute error excluding Sale 13 & 5.2\% \\
+Largest error & $+42.3\%$ (Sale 12, age 5) \\
+Average absolute error excluding Sale 12 & 6.6\% \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -370,10 +373,10 @@ Average absolute error excluding Sale 13 & 5.2\% \\
 \end{figure}
 
 \begin{itemize}
-\item \textbf{Accuracy.} A single valuation is typically within about 6.5\% of the actual price; for Target Ship 1 that is roughly $\pm$\usd{1.9}m.
+\item \textbf{Accuracy.} A single valuation is typically within about 7.5\% of the actual price; for Target Ship 1 that is roughly $\pm$\usd{2.2}m.
 \item \textbf{No systematic lean.} A bias of $+0.8\%$ indicates that the curve is neither consistently high nor low.
-\item \textbf{The young end is weak.} The only sale under nine years (Sale 13, age 5) is overvalued by 43.7\%: without it, the curve extrapolated to age 5 gives \usd{69}m against an actual \usd{48}m. Valuations are reliable in the dense 9--20-year range and not below it.
-\item \textbf{The old end is noisier.} The largest remaining errors are at ages 19--20 ($+15\%$, $+22\%$), where condition and the next special survey matter more than age alone.
+\item \textbf{The young end is weak.} The only sale under nine years (Sale 12, age 5) is overvalued by 42.3\%: without it, the curve extrapolated to age 5 gives \usd{70}m against an actual \usd{49}m. Valuations are reliable in the dense 9--20-year range and not below it.
+\item \textbf{Single sales can miss widely.} The next largest errors are Sale 39 (age 20, $+38.6\%$), Sales 38 and 30 (age 13, $+21.8\%$ and $-21.6\%$) and Sale 24 (age 20, $+19.2\%$), where condition, survey timing and deal terms matter more than age alone. Sales from December and January also carry large time adjustments (up to $+39\%$), so any benchmark error passes into them.
 \end{itemize}
 Errors for every sale are listed in Appendix~\ref{app:data}.
 
@@ -392,11 +395,11 @@ Limitation & Effect & Remedy \\
 Age is the only variable & Yard, size, survey timing, scrubber and fuel efficiency remain in the error & Hedonic regression (M1+) \\
 No sales under five years & Young end of the curve and $\hat a$ are extrapolated & Newbuilding anchor; more young sales \\
 One constant rate of depreciation & Actual values fall slowly at first and faster later & Non-linear or piecewise age term \\
-En bloc sales entered separately & One deal at one price counts three times (Sales 05--07) or twice (Sales 19--20) & Treat an en bloc deal as one observation \\
-Four sales reported after the valuation date & Information not available to a valuer on 22 May 2026 & Restrict to sales up to the valuation date \\
-Value read as $e^{\widehat{\ln P}}$ & Estimates the median; the mean is higher by about $e^{\hat\sigma^2/2} - 1 = 0.3\%$ & Smearing correction \citep{Duan1983} \\
-Range is $\pm$1 SD of dollar residuals & Simple spread, not a formal interval; the 68\% prediction interval on log price is \usd{27.19}--32.05m & Prediction interval on log price \\
-30 sales over eight months & Estimates will move as data are added & Extend the sales register \\
+En bloc sales entered separately & One deal at one price counts three times (Sales 04--06) or twice (Sales 18--19, 27--28, 40--41) & Treat an en bloc deal as one observation \\
+Strong market rise December 2025 to May 2026 & Early sales are adjusted by up to $+39\%$; benchmark errors pass into them & Second-broker benchmark; shorter window as a test \\
+Value read as $e^{\widehat{\ln P}}$ & Estimates the median; the mean is higher by about $e^{\hat\sigma^2/2} - 1 = 0.5\%$ & Smearing correction \citep{Duan1983} \\
+Range is $\pm$1 SD of dollar residuals & Simple spread, not a formal interval; the 68\% prediction interval on log price is \usd{26.78}--32.87m & Prediction interval on log price \\
+43 sales over five months & Estimates will move as data are added & Extend the sales register \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -404,7 +407,7 @@ Range is $\pm$1 SD of dollar residuals & Simple spread, not a formal interval; t
 % ───────────────────────────────────────────────────────────
 \section{Conclusion}
 
-A one-variable exponential depreciation curve, fitted by OLS on log price to 30 date-adjusted MR sales, explains 94\% of the variation in log price and values Target Ship 1 at \usd{29.52}m, 3.6\% above its reported sale price and with the reported price inside the range. A leave-one-out back-test shows an average error of 6.5\% with negligible bias, and identifies the young end of the age range as the main weakness. The model provides a transparent, reproducible market value and a baseline for the hedonic regression (M1+), which adds the ship characteristics that age alone cannot capture.
+A one-variable exponential depreciation curve, fitted by OLS on log price to 43 date-adjusted MR sales reported up to the valuation date, explains 91\% of the variation in log price and values Target Ship 1 at \usd{29.67}m, 4.1\% above its reported sale price and with the reported price inside the range. A leave-one-out back-test shows an average error of 7.5\% with negligible bias, and identifies the young end of the age range as the main weakness. The model provides a transparent, reproducible market value and a baseline for the hedonic regression (M1+), which adds the ship characteristics that age alone cannot capture.
 
 % ───────────────────────────────────────────────────────────
 \begin{thebibliography}{99}
@@ -455,43 +458,56 @@ Prices are adjusted to 22 May 2026 by \eqref{eq:index}. ``Curve without it'' is 
 Sale & Age & Adjusted price (\usd{}m) & Curve without it (\usd{}m) & Error \\
 \midrule
 \endhead
-Sale 01 & 17 & 23.50 & 22.91 & $-2.5\%$ \\
-Sale 02 & 19 & 17.00 & 19.57 & $+15.1\%$ \\
-Sale 03 & 18 & 22.17 & 21.02 & $-5.2\%$ \\
-Sale 04 & 14 & 30.85 & 29.48 & $-4.4\%$ \\
-Sale 05 & 12 & 36.82 & 34.83 & $-5.4\%$ \\
-Sale 06 & 12 & 36.82 & 34.83 & $-5.4\%$ \\
-Sale 07 & 12 & 36.82 & 34.83 & $-5.4\%$ \\
-Sale 08 & 19 & 19.00 & 19.41 & $+2.1\%$ \\
-Sale 09 & 15 & 28.50 & 27.09 & $-4.9\%$ \\
-Sale 10 & 20 & 16.21 & 17.98 & $+11.0\%$ \\
-Sale 11 & 15 & 28.21 & 27.10 & $-3.9\%$ \\
-Sale 12 & 16 & 26.82 & 24.88 & $-7.2\%$ \\
-Sale 13 & 5 & 48.23 & 69.29 & $+43.7\%$ \\
-Sale 14 & 9 & 44.61 & 45.03 & $+0.9\%$ \\
-Sale 15 & 18 & 20.65 & 21.11 & $+2.2\%$ \\
-Sale 16 & 18 & 20.36 & 21.12 & $+3.8\%$ \\
-Sale 17 & 18 & 19.66 & 21.17 & $+7.7\%$ \\
-Sale 18 & 16 & 25.59 & 24.92 & $-2.6\%$ \\
-Sale 19 & 11 & 38.84 & 37.95 & $-2.3\%$ \\
-Sale 20 & 11 & 38.84 & 37.95 & $-2.3\%$ \\
-Sale 21 & 19 & 19.56 & 19.36 & $-1.0\%$ \\
-Sale 22 & 14 & 30.18 & 29.50 & $-2.2\%$ \\
-Sale 23 & 20 & 18.44 & 17.75 & $-3.7\%$ \\
-Sale 24 & 16 & 27.94 & 24.84 & $-11.1\%$ \\
-Sale 25 & 20 & 14.86 & 18.14 & $+22.0\%$ \\
-Sale 26 & 12 & 37.34 & 34.81 & $-6.8\%$ \\
-Sale 27 & 10 & 42.08 & 41.28 & $-1.9\%$ \\
-Sale 28 & 11 & 39.20 & 37.92 & $-3.3\%$ \\
-Sale 29 & 13 & 32.00 & 32.12 & $+0.4\%$ \\
-Sale 30 & 19 & 20.00 & 19.33 & $-3.3\%$ \\
+Sale 01 & 17 & 23.50 & 22.78 & $-3.1\%$ \\
+Sale 02 & 19 & 17.00 & 19.25 & $+13.2\%$ \\
+Sale 03 & 14 & 30.85 & 29.64 & $-3.9\%$ \\
+Sale 04 & 12 & 36.82 & 35.30 & $-4.1\%$ \\
+Sale 05 & 12 & 36.82 & 35.30 & $-4.1\%$ \\
+Sale 06 & 12 & 36.82 & 35.30 & $-4.1\%$ \\
+Sale 07 & 19 & 19.00 & 19.14 & $+0.7\%$ \\
+Sale 08 & 15 & 28.50 & 27.14 & $-4.8\%$ \\
+Sale 09 & 20 & 16.21 & 17.62 & $+8.7\%$ \\
+Sale 10 & 15 & 28.21 & 27.15 & $-3.8\%$ \\
+Sale 11 & 16 & 26.82 & 24.85 & $-7.4\%$ \\
+Sale 12 & 5 & 49.34 & 70.21 & $+42.3\%$ \\
+Sale 13 & 9 & 44.61 & 46.14 & $+3.4\%$ \\
+Sale 14 & 18 & 20.65 & 20.90 & $+1.2\%$ \\
+Sale 15 & 18 & 20.36 & 20.91 & $+2.7\%$ \\
+Sale 16 & 18 & 19.66 & 20.94 & $+6.5\%$ \\
+Sale 17 & 16 & 25.59 & 24.87 & $-2.8\%$ \\
+Sale 18 & 11 & 38.84 & 38.58 & $-0.6\%$ \\
+Sale 19 & 11 & 38.84 & 38.58 & $-0.6\%$ \\
+Sale 20 & 19 & 19.56 & 19.11 & $-2.3\%$ \\
+Sale 21 & 14 & 30.18 & 29.65 & $-1.7\%$ \\
+Sale 22 & 20 & 18.44 & 17.46 & $-5.3\%$ \\
+Sale 23 & 16 & 27.94 & 24.82 & $-11.2\%$ \\
+Sale 24 & 20 & 14.86 & 17.72 & $+19.2\%$ \\
+Sale 25 & 12 & 37.34 & 35.27 & $-5.5\%$ \\
+Sale 26 & 10 & 42.08 & 42.14 & $+0.2\%$ \\
+Sale 27 & 17 & 22.24 & 22.82 & $+2.6\%$ \\
+Sale 28 & 17 & 22.24 & 22.82 & $+2.6\%$ \\
+Sale 29 & 10 & 42.12 & 42.14 & $+0.0\%$ \\
+Sale 30 & 13 & 41.01 & 32.14 & $-21.6\%$ \\
+Sale 31 & 19 & 20.85 & 19.05 & $-8.7\%$ \\
+Sale 32 & 20 & 17.10 & 17.55 & $+2.7\%$ \\
+Sale 33 & 12 & 37.48 & 35.27 & $-5.9\%$ \\
+Sale 34 & 19 & 19.09 & 19.13 & $+0.2\%$ \\
+Sale 35 & 16 & 29.83 & 24.78 & $-16.9\%$ \\
+Sale 36 & 18 & 21.87 & 20.85 & $-4.7\%$ \\
+Sale 37 & 14 & 26.76 & 29.75 & $+11.2\%$ \\
+Sale 38 & 13 & 26.76 & 32.59 & $+21.8\%$ \\
+Sale 39 & 20 & 12.91 & 17.90 & $+38.6\%$ \\
+Sale 40 & 11 & 38.84 & 38.58 & $-0.6\%$ \\
+Sale 41 & 11 & 38.84 & 38.58 & $-0.6\%$ \\
+Sale 42 & 18 & 22.38 & 20.83 & $-6.9\%$ \\
+Sale 43 & 16 & 27.94 & 24.82 & $-11.2\%$ \\
 \midrule
-\multicolumn{4}{@{}l}{Average absolute error / bias} & 6.5\% / $+0.8\%$ \\
+\multicolumn{4}{@{}l}{Average absolute error / bias} & 7.5\% / $+0.8\%$ \\
 \bottomrule
 \end{longtable}
 \end{center}
 
 \section{Reproducibility}
 
-All figures and numbers in this note are produced from \texttt{data/comparables.csv} by the Python code in the repository, and agree to the cent with the Excel implementation of the model.
+All figures and numbers in this note are produced from \texttt{data/sample/comparables.csv} by \texttt{examples/run\_age\_curve.py} (model, back-test and charts in \texttt{src/vessel\_valuation/}), and agree to the cent with the Excel implementation of the model.
 \end{document}

@@ -1,8 +1,5 @@
 # Valuation models
 
-This folder will contain Python implementations of vessel valuation models.
+- `age_curve.py`: M1 exponential age curve, fitted by OLS on log price (published, tested).
 
-The first model under development is the exponential age curve.
-Additional models will be added progressively.
-
-Status: work in progress. No validated implementation published yet.
+Further models will be added here.
