@@ -59,3 +59,40 @@ def backtest_chart(ages, backtest, out):
     fig.tight_layout()
     fig.savefig(Path(out), dpi=200)
     plt.close(fig)
+
+
+def hedonic_effects_chart(effects, out):
+    """M1+ model A: price effect of each yes/no feature with its 95% interval (orange = reliable)."""
+    keep = effects[~effects["term"].str.contains("age|ln_dwt")].iloc[::-1]
+    names = {"C(yard, Treatment('China'))[T.Japan]": "Built in Japan (vs China)",
+             "C(yard, Treatment('China'))[T.Korea]": "Built in Korea (vs China)",
+             "C(yard, Treatment('China'))[T.Other]": "Built elsewhere (vs China)",
+             "survey_due_12m": "Special survey due within 12 months", "survey_unknown": "Survey date not reported (control)",
+             "scrubber": "Scrubber fitted", "eco": "Eco design", "en_bloc_sale": "Sold en bloc"}
+    eff = np.exp(keep["b"]) - 1
+    lo, hi = np.exp(keep["b"] - 1.96 * keep["se"]) - 1, np.exp(keep["b"] + 1.96 * keep["se"]) - 1
+    y = np.arange(len(keep))
+    fig, ax = plt.subplots(figsize=(6.6, 3.0))
+    ax.axvline(0, color=MUTED, lw=0.8)
+    ax.hlines(y, lo * 100, hi * 100, color=DOT, lw=1.6)
+    ax.scatter(eff * 100, y, color=[CASE if r == "Yes" else DOT for r in keep["reliable"]], zorder=3, s=22)
+    ax.set_yticks(y, [names.get(t, t) for t in keep["term"]])
+    ax.set_xlabel("Effect on price (%), 95% interval; orange = reliable (p < 5%)")
+    ax.grid(axis="x", color=GRID, lw=0.6); ax.set_axisbelow(True)
+    for s in ("top", "right"):
+        ax.spines[s].set_visible(False)
+    fig.tight_layout(); fig.savefig(Path(out), dpi=200); plt.close(fig)
+
+
+def hedonic_backtest_chart(ages, bt_a, bt_b, out):
+    """M1+ leave-one-out misses on MR sales by age, models A and B."""
+    fig, ax = plt.subplots(figsize=(6.2, 2.8))
+    ax.axhline(0, color=MUTED, lw=0.8)
+    ax.scatter(ages, bt_a.errors * 100, s=16, color=CASE, zorder=3,
+               label=f"Model A (average miss {bt_a.average_miss:.1%}, bias {bt_a.bias:+.1%})")
+    ax.scatter(ages, bt_b.errors * 100, s=16, facecolor="white", edgecolor=DOT, zorder=3,
+               label=f"Model B (average miss {bt_b.average_miss:.1%}, bias {bt_b.bias:+.1%})")
+    ax.set_xlabel("Age at sale (years)"); ax.set_ylabel("Miss (%): model without the sale\n÷ reported price − 1")
+    ax.legend(frameon=False, fontsize=7.5, loc="upper left")
+    _style(ax)
+    fig.tight_layout(); fig.savefig(Path(out), dpi=200); plt.close(fig)
