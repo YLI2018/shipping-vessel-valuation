@@ -12,8 +12,8 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from vessel_valuation.models.hedonic import FORMULA_A, FORMULA_B, prepare, fit, solve_by_hand, value
-from vessel_valuation.analytics.backtest import leave_one_out_formula
+from shipping_valuation.models.hedonic import FORMULA_A, FORMULA_B, prepare, fit, solve_by_hand, value
+from shipping_valuation.evaluation.backtesting import leave_one_out_formula
 
 TARGET = pd.DataFrame([dict(segment="MR", type="Tanker", tanker=1, age=13.889117, dwt=51768, yard="Korea", survey_due_12m=1,
                             survey_unknown=0, scrubber=0, eco=0, en_bloc_sale=0, quarter="2026Q2")])

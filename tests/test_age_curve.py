@@ -12,9 +12,9 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from vessel_valuation.data.load import load_comparables
-from vessel_valuation.models.age_curve import fit_age_curve
-from vessel_valuation.analytics.backtest import leave_one_out
+from shipping_valuation.data.ingest import load_comparables
+from shipping_valuation.models.age_curve import fit_age_curve
+from shipping_valuation.evaluation.backtesting import leave_one_out
 
 
 class PublishedResults(unittest.TestCase):
