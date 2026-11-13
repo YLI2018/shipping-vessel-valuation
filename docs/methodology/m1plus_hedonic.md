@@ -28,7 +28,7 @@ A yes/no feature changes the price by $e^{\beta}-1$; for $\ln(\text{dwt})$, $\be
 | 1% more deadweight (tankers, total) | +0.58% | Yes |
 | Value lost per year of age (tankers, total) | 7.5% | Yes |
 
-Tankers have their own age and size slopes in model A, so the tanker rows are totals: base slope + tanker extra, with the standard error from both. In model B (MR only) the size effect comes out **negative** (−0.33% per 1% DWT, p = 0.33). A bigger ship cannot be worth less, so this number is marked *wrong sign* and not relied on: within the narrow MR band, size barely varies and the data cannot measure it.
+Tankers have their own age and size slopes in model A, so the tanker rows are totals: base slope + tanker extra, with the standard error from both. In model B (MR only), the estimated size effect is negative (−0.33% per 1% DWT, p = 0.33). The estimate is statistically uncertain, so this sample does not establish a reliable size premium within the narrow MR size range.
 
 ## Case: Target Ship 1 (MR product tanker, built 2012 in Korea), 22 May 2026
 
@@ -70,7 +70,7 @@ Each cell: average miss (bias). Differences are in percentage points of average 
 
 Tests 1 and 2 for all models, and test 3 for M1+, are reproduced by `examples/run_hedonic.py` from the public files (`m1_sale`, `deal` and `report_week` columns). Test 3 for M1 needs the licensed broker benchmark and is run privately. See [limitations](../limitations.md) for what the data and models cannot show.
 
-**What the coefficients say.** Model A measures what moves prices precisely, but pooling all tankers and bulkers makes it lean high on MR tankers. Model B is unbiased but has too few sales for precise effects. Most M1 comparables are Korean-built, so the Korea premium is already in the curve; Target Ship 1 has a special survey due within a year and sold about 4% below the curve. The estimated survey-due discount is consistent with the target selling below the age curve, but this regression does not establish that survey timing caused the difference. The survey effect is weak (−4.8%, p = 0.08) and not reliable in model B.
+**What the coefficients say.** Model A measures what moves prices precisely, but pooling all tankers and bulkers makes it lean high on MR tankers. Model B has low average bias (+1.1%) in the original 45-sale validation, but its bias varies across tests and its feature estimates are imprecise. Most M1 comparables are Korean-built, so the Korea premium is already in the curve; Target Ship 1 has a special survey due within a year and sold about 4% below the curve. The estimated survey-due discount is consistent with the target selling below the age curve, but this regression does not establish that survey timing caused the difference. The survey effect is weak (−4.8%, p = 0.08) and not reliable in model B.
 
 ## Files
 

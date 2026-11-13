@@ -51,7 +51,7 @@ python3 -m unittest discover -s tests
 
 ## Related
 
-**M1+ Hedonic regression** (in preparation) adds size, yard, survey timing, scrubber and market level to the age curve.
+[M1+ Hedonic regression](m1plus_hedonic.md) adds size, yard, survey timing, scrubber and market level to the age curve.
 
 ---
 
