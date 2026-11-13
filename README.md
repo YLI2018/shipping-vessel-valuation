@@ -19,14 +19,14 @@ Work in progress. Two models are published with their code, anonymised data, tes
 
 ![Fitted age curve](docs/methodology/figures/age_curve.png)
 
-Target Ship 1, an MR product tanker built in 2012, valued on **22 May 2026** using only the 43 comparable sales reported on or before that date:
+Target Ship 1, an MR product tanker built in 2012, valued on **22 May 2026** from 43 comparable sales. The dataset is described as containing sales reported on or before 22 May 2026. Report dates are not included in the published CSV, so that cutoff cannot be independently verified from this file.
 
 | Result | Value |
 |---|---:|
 | **Market value** | **US\$29.67m** (range US\$26.27m – 33.06m) |
 | Value lost per year of age | 8.4% |
 | Reported sale price | US\$28.45m: 4.1% below the curve, inside the range |
-| Leave-one-out back-test | average miss 7.5%, bias +0.8% |
+| Leave-one-out validation, 43 date-adjusted comparables | average miss 7.5%, bias +0.8% |
 
 The Python results agree with an independent Excel implementation of the model to 9 decimal places.
 
@@ -36,15 +36,19 @@ The Python results agree with an independent Excel implementation of the model t
 
 ![Feature effects](docs/methodology/figures/hedonic_effects.png)
 
-Target Ship 1, valued on **22 May 2026** using only sales reported on or before that date:
+Target Ship 1, valued on **22 May 2026**. The dataset is described as containing sales reported on or before 22 May 2026. Report dates are not included in the published CSV, so that cutoff cannot be independently verified from this file.
 
 | Result | Model A: 297 tankers and bulkers | Model B: 45 MR tankers |
 |---|---:|---:|
 | **Market value** | **US\$29.22m** (range US\$24.63m – 34.68m) | **US\$26.29m** (range US\$23.68m – 29.20m) |
 | Reported sale price US\$28.45m vs value | 2.6% below | 8.2% above |
-| Leave-one-out back-test on MR | average miss 12.3%, bias +9.6% | average miss 8.7%, bias +1.1% |
+| Leave-one-out validation, 45 MR sales | average miss 12.3%, bias +9.6% | average miss 8.7%, bias +1.1% |
 
-On 297 tanker and bulker sales, ships built in Japan sell for **21.5%** and in Korea for **16.9%** more than Chinese-built ships of the same age and size; a scrubber adds **8.9%**. M1+ values Target Ship 1 at US\$29.22m, but its back-test on MR tankers (average miss 12.3%) is weaker than the age curve's (7.5%): **M1 values, M1+ explains.**
+On 297 tanker and bulker sales, ships built in Japan sell for **21.5%** and in Korea for **16.9%** more than Chinese-built ships of the same age and size; a scrubber adds **8.9%**. M1+ values Target Ship 1 at US\$29.22m.
+
+M1 records a 7.5% average absolute percentage error on 43 date-adjusted comparables. Models A and B record 12.3% and 8.7% on 45 MR sales. Because the samples and price treatment differ, these results do not establish which model performs best.
+
+Leave-one-out validation fits the model on all other sales in the collected sample and predicts the omitted sale. Training may include sales reported after the omitted transaction, so this is not a historical forecasting test.
 
 📄 [M1+ page](docs/methodology/m1plus_hedonic.md) · [Technical note (PDF)](docs/methodology/M1plus_Hedonic_Technical_Note.pdf)
 
@@ -52,7 +56,7 @@ On 297 tanker and bulker sales, ships built in Japan sell for **21.5%** and in K
 
 - Traceable data and clearly stated assumptions.
 - Reproducible calculations and automated tests.
-- Validation that respects information availability: a valuation uses only data published on or before its date.
+- A valuation uses only data published on or before its date. Validation through time (each sale predicted from earlier sales only) is planned; the current leave-one-out validation is not a historical forecasting test.
 - Clear explanations of uncertainty and investment relevance.
 - Data shared here is anonymised; broker data and ship names are not published.
 
