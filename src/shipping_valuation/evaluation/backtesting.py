@@ -1,4 +1,7 @@
-"""Leave-one-out back-test: value each sale with a curve fitted without it."""
+"""Leave-one-out validation within the collected sample: value each sale with a model fitted on all the others.
+
+Training may include sales reported after the omitted one, so this is not a historical forecasting test.
+"""
 from dataclasses import dataclass
 
 import numpy as np
