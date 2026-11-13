@@ -1,4 +1,4 @@
-"""Charts for the M1 technical note: the fitted age curve and the leave-one-out back-test."""
+"""Charts for the M1 technical note: the fitted age curve and the leave-one-out validation."""
 from pathlib import Path
 
 import matplotlib
