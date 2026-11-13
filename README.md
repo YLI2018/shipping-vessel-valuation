@@ -63,6 +63,7 @@ python3 -m unittest discover -s tests
 - src/shipping_valuation/reporting/ — Report and chart generation.
 - data/sample/ — Anonymised example data.
 - docs/methodology/ — Model methodology: summary pages, technical notes (PDF) and charts.
+- notebooks/ — Exploratory analysis.
 - examples/ — Reproducible demonstrations.
 - tests/ — Automated calculation and data checks.
 
