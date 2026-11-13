@@ -23,7 +23,7 @@ Target Ship 1, an MR product tanker built in 2012, valued on **22 May 2026** fro
 
 | Result | Value |
 |---|---:|
-| **Market value** | **US\$29.67m** (range US\$26.27m – 33.06m) |
+| **Market value** | **US\$29.67m** (± 1 SD of residuals: US\$26.27m – 33.06m) |
 | Value lost per year of age | 8.4% |
 | Reported sale price | US\$28.45m: 4.1% below the curve, inside the range |
 | Leave-one-out validation, 43 date-adjusted comparables | average miss 7.5%, bias +0.8% |
@@ -40,13 +40,15 @@ Target Ship 1, valued on **22 May 2026**. The dataset is described as containing
 
 | Result | Model A: 297 tankers and bulkers | Model B: 45 MR tankers |
 |---|---:|---:|
-| **Market value** | **US\$29.22m** (range US\$24.63m – 34.68m) | **US\$26.29m** (range US\$23.68m – 29.20m) |
+| **Market value** | **US\$29.22m** (68% interval US\$24.63m – 34.68m) | **US\$26.29m** (68% interval US\$23.68m – 29.20m) |
 | Reported sale price US\$28.45m vs value | 2.6% below | 8.2% above |
 | Leave-one-out validation, 45 MR sales | average miss 12.3%, bias +9.6% | average miss 8.7%, bias +1.1% |
 
 On 297 tanker and bulker sales, ships built in Japan sell for **21.5%** and in Korea for **16.9%** more than Chinese-built ships of the same age and size; a scrubber adds **8.9%**. M1+ values Target Ship 1 at US\$29.22m.
 
 M1 records a 7.5% average absolute percentage error on 43 date-adjusted comparables. Models A and B record 12.3% and 8.7% on 45 MR sales. Because the samples and price treatment differ, these results do not establish which model performs best.
+
+**Same-sales check.** Scored on the same 43 MR sales, M1 has the lowest average miss in every test (M1 7.5%, model A 8.9%, model B 10.3% at 22 May prices; 5.8%, 8.1% and 7.1% when each sale is predicted only from earlier report weeks, 24 sales). Several gaps are within noise, so this supports M1 for the value and M1+ for explanation only modestly. Details: [validation on the same sales](docs/methodology/m1plus_hedonic.md#validation-on-the-same-sales).
 
 Leave-one-out validation fits the model on all other sales in the collected sample and predicts the omitted sale. Training may include sales reported after the omitted transaction, so this is not a historical forecasting test.
 
@@ -56,8 +58,8 @@ Leave-one-out validation fits the model on all other sales in the collected samp
 
 - Traceable data and clearly stated assumptions.
 - Reproducible calculations and automated tests.
-- A valuation uses only data published on or before its date. Validation through time (each sale predicted from earlier sales only) is planned; the current leave-one-out validation is not a historical forecasting test.
-- Clear explanations of uncertainty and investment relevance.
+- A valuation uses only data published on or before its date. Leave-one-out validation is not a historical forecasting test; a time-ordered test (each sale predicted only from earlier report weeks) is reported separately and rests on 24 sales.
+- Clear explanations of uncertainty and investment relevance: see [limitations](docs/limitations.md).
 - Data shared here is anonymised; broker data and ship names are not published.
 
 ## Run
@@ -77,6 +79,7 @@ python3 -m unittest discover -s tests
 - src/shipping_valuation/reporting/ — Report and chart generation.
 - data/sample/ — Anonymised example data.
 - docs/methodology/ — Model methodology: summary pages, technical notes (PDF) and charts.
+- docs/limitations.md — What the data and models can and cannot show.
 - notebooks/ — Exploratory analysis.
 - examples/ — Reproducible demonstrations.
 - tests/ — Automated calculation and data checks.
