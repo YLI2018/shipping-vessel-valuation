@@ -30,8 +30,7 @@ rely on each result.
     the nearest age point (5, 10 or 15 years). The benchmark nearest a sale's report date may be a few days after it.
 12. **M1+ model A pools tankers and bulkers.** Yard, scrubber and survey effects are assumed the same for both; tankers
     get their own age and size slopes. It leans high on MR tankers.
-13. **M1+ model B has too few sales.** Most effects are not significant, and its size effect has the wrong sign
-    (bigger ships cannot be worth less), so it is not relied on.
+13. M1+ model B has a small sample. Most feature estimates are not statistically significant. Its negative size coefficient is statistically uncertain and should not be interpreted as evidence that larger ships are worth less.
 14. **Market level by quarter is coarse** in a rising market. A value at 22 May uses the 2026 Q2 level, an average of
     April and May sales.
 15. **Associations, not causes.** A regression shows what goes with higher or lower prices. It does not show that a
