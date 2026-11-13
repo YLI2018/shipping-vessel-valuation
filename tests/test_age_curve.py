@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -42,6 +43,11 @@ class PublishedResults(unittest.TestCase):
         bt = leave_one_out(self.ages, self.prices)
         self.assertAlmostEqual(bt.average_miss, 0.0745, places=4)
         self.assertAlmostEqual(bt.bias, 0.0082, places=4)
+
+    def test_backtest_whole_deals_held_out(self):
+        deals = pd.read_csv(ROOT / "data" / "sample" / "comparables.csv")["deal"]
+        bt = leave_one_out(self.ages, self.prices, deals)
+        self.assertAlmostEqual(bt.average_miss, 0.0749, places=4)
 
 
 class Method(unittest.TestCase):
