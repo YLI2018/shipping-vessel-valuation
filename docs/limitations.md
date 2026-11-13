@@ -1,0 +1,59 @@
+# Limitations: what the data and models can and cannot show
+
+These apply to M1 (vessel age curve) and M1+ (hedonic price model). They are stated so a reader can judge how far to
+rely on each result.
+
+## Data
+
+1. **Short window.** Sales reported 16 Dec 2025 to 22 May 2026, about five months, in a rising MR market. The models
+   describe that market, not a full cycle.
+2. **Reported prices.** Prices come from weekly broker sale-and-purchase reports. They are reported prices, not
+   verified contract prices. Sales with only a range ("low", "region", "excess") are excluded. A few report pages were
+   typed in from screenshots.
+3. **Report date, not sale date.** The date known is when a sale was reported; the sale date itself is unknown.
+4. **Features from report text.** Scrubber and eco design are recorded only when a broker mentions them, so they are
+   under-recorded (eco is rare). Survey dates are missing for many sales (handled with a "survey unknown" flag).
+5. **Age from build year only.** M1 uses report year minus build year; M1+ assumes a mid-year build date.
+6. **Package deals.** 18 deals (40 ships, 6 deals and 13 ships among MR tankers) were sold as packages. Most were priced
+   per ship at the same price; in one MR deal the per-ship price is an equal split of the total. For fitting, M1 keeps
+   one ship per deal flagged en bloc and keeps the others as separate sales; M1+ keeps every ship with an en bloc flag.
+   This is why M1 has 43 MR sales and M1+ has 45. Sister ships at the same price give their deal extra weight.
+7. **Related-party sales** are excluded only when identified (one so far).
+8. **Information as first recorded.** Later corrections to a sale are not tracked.
+9. **Small samples.** M1: 43 comparables. M1+ model B: 45 MR sales. M1+ model A: 297 tanker and bulker sales.
+10. **Anonymised public data.** The CSVs carry no ship names or dates, only a report week (week 1 = week starting
+    Monday 15 Dec 2025). The 22 May cutoff and the matching between files rest on the private database.
+
+## Models
+
+11. **M1 uses age only.** Log price on age, after moving each price to the valuation date with a broker benchmark for
+    the nearest age point (5, 10 or 15 years). The benchmark nearest a sale's report date may be a few days after it.
+12. **M1+ model A pools tankers and bulkers.** Yard, scrubber and survey effects are assumed the same for both; tankers
+    get their own age and size slopes. It leans high on MR tankers.
+13. **M1+ model B has too few sales.** Most effects are not significant, and its size effect has the wrong sign
+    (bigger ships cannot be worth less), so it is not relied on.
+14. **Market level by quarter is coarse** in a rising market. A value at 22 May uses the 2026 Q2 level, an average of
+    April and May sales.
+15. **Associations, not causes.** A regression shows what goes with higher or lower prices. It does not show that a
+    feature causes the difference. The survey-due discount is weak (p about 0.08).
+16. **Many features are tested at once,** so one significant result may be chance.
+17. **Ranges.** M1's range on the front page is ± 1 standard deviation of residuals in dollars (26.27–33.06); the M1+
+    page shows 68% prediction intervals on the log scale (M1: 26.78–32.87). Both assume past misses describe the next sale.
+
+## Validation
+
+18. **Leave-one-out validation is within the collected sample.** Training may include sales reported after the held-out
+    sale, so on its own it is not a historical forecasting test.
+19. **Same-sales comparison.** On M1's 43 sales, M1 has the lowest average miss in every test, but several gaps are
+    within the bootstrap interval. Gaps of one or two points are not conclusive with 43 sales.
+20. **Package deals in validation.** Holding out whole deals (rather than one ship) removes help from sister ships. It
+    raises the M1+ errors slightly and barely moves M1's.
+21. **Time-ordered test.** Only 24 of 43 sales can be tested (the earliest have too little earlier data); 3 of them
+    use the previous quarter's market level. The result rests on few sales and on the minimum-data rule.
+22. **M1's error is the same at 22 May and at report-date prices** by construction (the same benchmark moves both its
+    price and its prediction).
+
+## Use
+
+23. **Portfolio exercise.** The values are model estimates from public broker reports. They do not use inspection,
+    condition, class or charter records and are not investment advice.
