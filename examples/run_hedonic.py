@@ -1,4 +1,4 @@
-"""M1+ hedonic model, step by step: fit models A and B, value Target Ship 1, back-test on MR sales, draw the charts.
+"""M1+ hedonic model, step by step: fit models A and B, value Target Ship 1, leave-one-out validation on MR sales, draw the charts.
 
 Run from the repository root:  python3 examples/run_hedonic.py
 Reads data/sample/hedonic_sales.csv (anonymised; sales reported on or before 22 May 2026).
@@ -45,7 +45,7 @@ for name, v in (("A", vA), ("B", vB)):
           f"(68% range ${v.low:.2f}m – ${v.high:.2f}m); reported ${KNOWN_PRICE}m is {KNOWN_PRICE / v.value - 1:+.1%}")
 print(f"        M1 age curve: ${M1_VALUE}m")
 
-print("Step 5  Back-test on MR sales, leave one out")
+print("Step 5  Leave-one-out validation on MR sales (not a historical forecasting test)")
 btA = leave_one_out_formula(FORMULA_A, sales, mr.index)
 btB = leave_one_out_formula(FORMULA_B, mr, mr.index)
 for name, bt in (("A", btA), ("B", btB)):
