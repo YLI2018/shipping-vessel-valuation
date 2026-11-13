@@ -34,6 +34,16 @@ The Python results agree with an independent Excel implementation of the model t
 
 ## M1+ headline result
 
+![Feature effects](docs/methodology/figures/hedonic_effects.png)
+
+Target Ship 1, valued on **22 May 2026** using only sales reported on or before that date:
+
+| Result | Model A: 297 tankers and bulkers | Model B: 45 MR tankers |
+|---|---:|---:|
+| **Market value** | **US\$29.22m** (range US\$24.63m – 34.68m) | **US\$26.29m** (range US\$23.68m – 29.20m) |
+| Reported sale price US\$28.45m vs value | 2.6% below | 8.2% above |
+| Leave-one-out back-test on MR | average miss 12.3%, bias +9.6% | average miss 8.7%, bias +1.1% |
+
 On 297 tanker and bulker sales, ships built in Japan sell for **21.5%** and in Korea for **16.9%** more than Chinese-built ships of the same age and size; a scrubber adds **8.9%**. M1+ values Target Ship 1 at US\$29.22m, but its back-test on MR tankers (average miss 12.3%) is weaker than the age curve's (7.5%): **M1 values, M1+ explains.**
 
 📄 [M1+ page](docs/methodology/m1plus_hedonic.md) · [Technical note (PDF)](docs/methodology/M1plus_Hedonic_Technical_Note.pdf)
