@@ -68,8 +68,6 @@ def value(model, ship: pd.DataFrame) -> HedonicValue:
 
 def _row(term, b, se, p):
     reliable = "Yes" if p < 0.05 else ("Weak" if p < 0.10 else "No")
-    if term.startswith("ln_dwt") and ":" not in term and b < 0:
-        reliable = "No (wrong sign)"   # bigger ships cannot be worth less: the data cannot measure size here
     return dict(term=term, b=float(b), se=float(se), p=float(p),
                 effect=f"{b:+.2f}% per 1% DWT" if "ln_dwt" in term else f"{np.exp(b) - 1:+.1%}", reliable=reliable)
 
