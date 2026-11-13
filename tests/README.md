@@ -3,4 +3,7 @@
 This folder will contain tests for model calculations,
 data checks and expected behaviour.
 
-No tests implemented yet.
+- `test_age_curve.py`: M1 published results and refusal of bad input (5 tests).
+- `test_hedonic.py`: M1+ published results (5 tests).
+
+Run all: `python3 -m unittest discover -s tests`
