@@ -11,13 +11,13 @@ Work in progress. Two models are published with their code, anonymised data, tes
 
 | Model | Question it answers | Status |
 |---|---|---|
-| [M1 Vessel age curve](docs/M1_age_curve.md) | What is a second-hand ship worth, from recent sales of similar ships? | Published |
-| [M1+ Hedonic price model](docs/M1plus_hedonic.md) | How do size, yard, survey timing and scrubbers move the price beyond age? | Published |
+| [M1 Vessel age curve](docs/methodology/m1_age_curve.md) | What is a second-hand ship worth, from recent sales of similar ships? | Published |
+| [M1+ Hedonic price model](docs/methodology/m1plus_hedonic.md) | How do size, yard, survey timing and scrubbers move the price beyond age? | Published |
 | Discounted cash flow and others | What is the ship worth from the cash it can earn? | Planned |
 
 ## M1 headline result
 
-![Fitted age curve](docs/figures/age_curve.png)
+![Fitted age curve](docs/methodology/figures/age_curve.png)
 
 Target Ship 1, an MR product tanker built in 2012, valued on **22 May 2026** using only the 43 comparable sales reported on or before that date:
 
@@ -30,13 +30,13 @@ Target Ship 1, an MR product tanker built in 2012, valued on **22 May 2026** usi
 
 The Python results agree with an independent Excel implementation of the model to 9 decimal places.
 
-📄 [M1 page](docs/M1_age_curve.md) · [Technical note (PDF)](docs/M1_Age_Curve_Technical_Note.pdf)
+📄 [M1 page](docs/methodology/m1_age_curve.md) · [Technical note (PDF)](docs/methodology/M1_Age_Curve_Technical_Note.pdf)
 
 ## M1+ headline result
 
 On 297 tanker and bulker sales, ships built in Japan sell for **21.5%** and in Korea for **16.9%** more than Chinese-built ships of the same age and size; a scrubber adds **8.9%**. M1+ values Target Ship 1 at US\$29.22m, but its back-test on MR tankers (average miss 12.3%) is weaker than the age curve's (7.5%): **M1 values, M1+ explains.**
 
-📄 [M1+ page](docs/M1plus_hedonic.md) · [Technical note (PDF)](docs/M1plus_Hedonic_Technical_Note.pdf)
+📄 [M1+ page](docs/methodology/m1plus_hedonic.md) · [Technical note (PDF)](docs/methodology/M1plus_Hedonic_Technical_Note.pdf)
 
 ## Research standards
 
@@ -57,13 +57,12 @@ python3 -m unittest discover -s tests
 
 ## Structure
 
-- src/vessel_valuation/data/ — Data-processing code.
-- src/vessel_valuation/models/ — Valuation models.
-- src/vessel_valuation/analytics/ — Validation and sensitivity analysis.
-- src/vessel_valuation/reporting/ — Report and chart generation.
+- src/shipping_valuation/data/ — Data-processing code.
+- src/shipping_valuation/models/ — Valuation models.
+- src/shipping_valuation/evaluation/ — Validation and sensitivity analysis.
+- src/shipping_valuation/reporting/ — Report and chart generation.
 - data/sample/ — Anonymised example data.
-- docs/ — Methodology and research reports.
-- notebooks/ — Exploratory analysis.
+- docs/methodology/ — Model methodology: summary pages, technical notes (PDF) and charts.
 - examples/ — Reproducible demonstrations.
 - tests/ — Automated calculation and data checks.
 
