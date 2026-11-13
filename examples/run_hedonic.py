@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from shipping_valuation.models.hedonic import FORMULA_A, FORMULA_B, prepare, fit, solve_by_hand, terms_for, value, effects
-from shipping_valuation.evaluation.backtesting import leave_one_out_formula
+from shipping_valuation.evaluation.backtesting import leave_one_out, leave_one_out_formula, time_ordered_formula
 from shipping_valuation.reporting.figures import hedonic_effects_chart, hedonic_backtest_chart
 
 # Target Ship 1 on 22 May 2026: MR, built 2012 in Korea, 51,768 dwt, survey due within 12 months
@@ -58,3 +58,29 @@ for ext in ("pdf", "png"):
     hedonic_effects_chart(effects(mA), out / f"hedonic_effects.{ext}")
     hedonic_backtest_chart(mr["age"].values, btA, btB, out / f"hedonic_backtest.{ext}")
 print("Charts written to docs/methodology/figures/")
+
+print("Step 6  Same-sales validation: M1, model A and model B scored on M1's 43 comparables")
+comps = pd.read_csv(ROOT / "data" / "sample" / "comparables.csv")
+test = sales[sales["m1_sale"].notna()]
+test = test.loc[test["m1_sale"].map({s: i for i, s in enumerate(comps["sale"])}).sort_values().index]
+price_22may = test["m1_sale"].map(comps.set_index("sale")["adjusted_price_musd"])   # M1's price moved to 22 May
+rows = []
+for name, deals in (("Test 1  leave one sale out", None), ("Test 2  leave one DEAL out", "deal")):
+    for label, quarter, observed in (("prices at 22 May", "2026Q2", price_22may), ("prices at report date", None, None)):
+        a = leave_one_out_formula(FORMULA_A, sales, test.index, deals, quarter, observed)
+        b = leave_one_out_formula(FORMULA_B, mr, test.index, deals, quarter, observed)
+        m1 = leave_one_out(comps["age"], comps["adjusted_price_musd"], comps["deal"] if deals else None)
+        rows.append((f"{name}, {label}", m1, a, b))
+# Test 3: earlier report weeks only; start once there are >= 10 earlier M1 comparables, >= 20 earlier MR sales and
+# >= 60 earlier sales, and the ship's yard country has been seen among earlier MR sales
+eligible = [i for i in test.index
+            if (comps["report_week"] < sales.at[i, "report_week"]).sum() >= 10
+            and (mr["report_week"] < sales.at[i, "report_week"]).sum() >= 20
+            and (sales["report_week"] < sales.at[i, "report_week"]).sum() >= 60
+            and sales.at[i, "yard"] in set(mr.loc[mr["report_week"] < sales.at[i, "report_week"], "yard"])]
+rows.append((f"Test 3  earlier report weeks only ({len(eligible)} sales)", None,
+             time_ordered_formula(FORMULA_A, sales, eligible), time_ordered_formula(FORMULA_B, mr, eligible)))
+for name, m1, a, b in rows:
+    m1_text = f"M1 {m1.average_miss:5.1%} ({m1.bias:+.1%})" if m1 is not None else "M1 needs the broker benchmark (private)"
+    print(f"        {name:<52} {m1_text}   A {a.average_miss:5.1%} ({a.bias:+.1%})   B {b.average_miss:5.1%} ({b.bias:+.1%})")
+print("        average miss (bias); Test 3 for M1 is run privately because it needs the licensed broker benchmark")
