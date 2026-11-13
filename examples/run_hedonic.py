@@ -2,7 +2,7 @@
 
 Run from the repository root:  python3 examples/run_hedonic.py
 Reads data/sample/hedonic_sales.csv (anonymised; sales reported on or before 22 May 2026).
-Writes docs/figures/hedonic_effects and hedonic_backtest, as PDF and PNG.
+Writes docs/methodology/figures/hedonic_effects and hedonic_backtest, as PDF and PNG.
 """
 import sys
 from pathlib import Path
@@ -13,9 +13,9 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from vessel_valuation.models.hedonic import FORMULA_A, FORMULA_B, prepare, fit, solve_by_hand, terms_for, value, effects
-from vessel_valuation.analytics.backtest import leave_one_out_formula
-from vessel_valuation.reporting.figures import hedonic_effects_chart, hedonic_backtest_chart
+from shipping_valuation.models.hedonic import FORMULA_A, FORMULA_B, prepare, fit, solve_by_hand, terms_for, value, effects
+from shipping_valuation.evaluation.backtesting import leave_one_out_formula
+from shipping_valuation.reporting.figures import hedonic_effects_chart, hedonic_backtest_chart
 
 # Target Ship 1 on 22 May 2026: MR, built 2012 in Korea, 51,768 dwt, survey due within 12 months
 TARGET = pd.DataFrame([dict(segment="MR", type="Tanker", tanker=1, age=13.889117, dwt=51768, yard="Korea", survey_due_12m=1,
@@ -52,9 +52,9 @@ for name, bt in (("A", btA), ("B", btB)):
     print(f"        model {name}: average miss {bt.average_miss:.1%}, bias {bt.bias:+.1%}")
 print(f"        M1 age curve: average miss {M1_MISS:.1%}, bias +0.8%")
 
-out = ROOT / "docs" / "figures"
+out = ROOT / "docs" / "methodology" / "figures"
 out.mkdir(parents=True, exist_ok=True)
 for ext in ("pdf", "png"):
     hedonic_effects_chart(effects(mA), out / f"hedonic_effects.{ext}")
     hedonic_backtest_chart(mr["age"].values, btA, btB, out / f"hedonic_backtest.{ext}")
-print("Charts written to docs/figures/")
+print("Charts written to docs/methodology/figures/")
