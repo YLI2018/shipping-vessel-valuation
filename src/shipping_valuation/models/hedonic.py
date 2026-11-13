@@ -66,14 +66,26 @@ def value(model, ship: pd.DataFrame) -> HedonicValue:
                         high=float(np.exp(frame["obs_ci_upper"].iloc[0]) * smear), ln_price=ln_p, smearing=smear)
 
 
+def _row(term, b, se, p):
+    reliable = "Yes" if p < 0.05 else ("Weak" if p < 0.10 else "No")
+    if term.startswith("ln_dwt") and ":" not in term and b < 0:
+        reliable = "No (wrong sign)"   # bigger ships cannot be worth less: the data cannot measure size here
+    return dict(term=term, b=float(b), se=float(se), p=float(p),
+                effect=f"{b:+.2f}% per 1% DWT" if "ln_dwt" in term else f"{np.exp(b) - 1:+.1%}", reliable=reliable)
+
+
 def effects(model) -> pd.DataFrame:
-    """Every coefficient except intercept and market level, with its effect in words and reliability."""
-    rows = []
-    for term, b in model.params.items():
-        if term == "Intercept" or "quarter" in term:
-            continue
-        p = float(model.pvalues[term])
-        rows.append(dict(term=term, b=float(b), se=float(model.bse[term]), p=p,
-                         effect=f"{b:+.2f}% per 1% DWT" if "ln_dwt" in term else f"{np.exp(b) - 1:+.1%}",
-                         reliable="Yes" if p < 0.05 else ("Weak" if p < 0.10 else "No")))
+    """Every coefficient except intercept and market level, with its effect in words and reliability.
+
+    Where tankers have their own slope (age:tanker, ln_dwt:tanker), a combined tanker row is added:
+    b_total = b_base + b_extra, with its standard error from the covariance of the two coefficients.
+    """
+    rows = [_row(t, b, model.bse[t], model.pvalues[t]) for t, b in model.params.items()
+            if t != "Intercept" and "quarter" not in t]
+    names = list(model.params.index)
+    for base in ("age", "ln_dwt"):
+        if f"{base}:tanker" in names:
+            r = np.zeros(len(names)); r[names.index(base)] = 1; r[names.index(f"{base}:tanker")] = 1
+            t = model.t_test(r)
+            rows.append(_row(f"{base} (tankers, total)", t.effect[0], np.ravel(t.sd)[0], np.ravel(t.pvalue)[0]))
     return pd.DataFrame(rows)
