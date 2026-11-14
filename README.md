@@ -5,7 +5,7 @@ vessel valuation methods.
 
 ## Project status
 
-Work in progress. Two models are published with their code, anonymised data, tests and technical notes: the **M1 vessel age curve** and the **M1+ hedonic price model**.
+Work in progress. Three models are published with their code, anonymised data and tests: the **M1 vessel age curve** and the **M1+ hedonic price model** (with technical notes), and the **M2 discounted cash flow model**.
 
 ## Models
 
@@ -13,7 +13,8 @@ Work in progress. Two models are published with their code, anonymised data, tes
 |---|---|---|
 | [M1 Vessel age curve](docs/methodology/m1_age_curve.md) | What is a second-hand ship worth, from recent sales of similar ships? | Published |
 | [M1+ Hedonic price model](docs/methodology/m1plus_hedonic.md) | How do size, yard, survey timing and scrubbers move the price beyond age? | Published |
-| Discounted cash flow and others | What is the ship worth from the cash it can earn? | Planned |
+| [M2 Discounted cash flow](docs/methodology/m2_dcf.md) | What is the ship worth from the cash it can earn, and what is a price betting on? | Published |
+| Financing and others | What does the owner earn after the loan? | Planned |
 
 ## M1 headline result
 
@@ -54,6 +55,23 @@ Leave-one-out validation fits the model on all other sales in the collected samp
 
 📄 [M1+ page](docs/methodology/m1plus_hedonic.md) · [Technical note (PDF)](docs/methodology/M1plus_Hedonic_Technical_Note.pdf)
 
+## M2 headline result
+
+![Value against the long-run TCE](docs/methodology/figures/dcf_longrun_tce.png)
+
+Target Ship 1, valued on **22 May 2026** from the cash it can earn over five years plus its sale at the end, discounted at a 7.30% WACC.
+
+| Result | Value |
+|---|---:|
+| **DCF value** (sale priced from the earnings left) | **US\$26.87m** |
+| DCF value with the sale at today's market (M1 curve) | US\$32.25m |
+| Price tested US\$28.45m: IRR | 5.4% a year, against 7.30% required |
+| Long-run earnings at which value = price | US\$16,925 a day (model: US\$16,000) |
+
+The long-run earnings assumption sets both the later cash and the sale price, so it is the key input: each US\$1,000 a day moves the value by about US\$1.7m. Earnings for years 1–3 use broker time-charter estimates, not FFA prices.
+
+📄 [M2 page](docs/methodology/m2_dcf.md)
+
 ## Research standards
 
 - Traceable data and clearly stated assumptions.
@@ -68,6 +86,7 @@ Leave-one-out validation fits the model on all other sales in the collected samp
 python3 -m pip install -r requirements.txt
 python3 examples/run_age_curve.py
 python3 examples/run_hedonic.py
+python3 examples/run_dcf.py
 python3 -m unittest discover -s tests
 ```
 
