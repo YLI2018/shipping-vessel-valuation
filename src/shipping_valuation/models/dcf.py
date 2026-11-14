@@ -2,13 +2,16 @@
 
 Year t = 1 .. hold, cash at each year end:
     earning days_t = earning days - dry-dock days in a survey year (every 5 years from the survey year)
-    cash_t = TCE_t x earning days_t - opex x 365 x (1 + g)^(t-1) - survey cost in a survey year - EU ETS
+    cash_t = TCE_t x (1 - commission) x earning days_t - opex x 365 x (1 + g)^(t-1) - survey cost in a survey year
+             - EU ETS          (no survey in the last year of economic life: the ship is scrapped instead)
     value  = sum_t cash_t / (1 + r)^t  +  sale / (1 + r)^hold
+TCE_t: the 1-, 2- and 3-year forecasts for t = 1..3, the long-run TCE after (in the hold and after the sale alike).
+The hold must be 1 .. economic life - age.
 
 Sale price at the end, two bases:
     "earnings"  (default) what a buyer at the sale would pay for the cash the ship can still earn: the long-run TCE
-                from the sale to the end of economic life, less opex and surveys (none in the last year), plus scrap,
-                discounted to the sale date at r. Consistent with the earnings forecast.
+                (or the 1-3 year forecast, if the sale comes before year 3) from the sale to the end of economic life,
+                less opex and surveys (none in the last year), plus scrap, discounted to the sale date at r. Consistent with the earnings forecast.
     "market"    the M1 age curve at the exit age (today's prices for an older ship), never below scrap.
 r = WACC = (1 - Wd) x (Rf + beta x ERP) + Wd x Kd, before tax (tonnage tax).
 """
@@ -42,6 +45,7 @@ class DCFInputs:
     cost_of_debt: float
     debt_share: float
     exit_basis: str = "earnings"  # "earnings" or "market"
+    commission: float = 0.0       # share of hire lost to address and brokerage commission (0 = gross hire)
 
     @property
     def cost_of_equity(self) -> float:
@@ -91,23 +95,29 @@ class YearRow:
         return (self.cash + self.sale) * self.discount_factor
 
 
-def _year(p: DCFInputs, t: int, tce: float, last_year_of_life: bool = False):
+def _tce(p: DCFInputs, t: int) -> float:
+    return p.tce[t - 1] if t <= len(p.tce) else p.tce_long_run
+
+
+def _year(p: DCFInputs, t: int):
+    """Cash in DCF year t (counted from the base date), the same rule in the hold and after the sale."""
+    last_year_of_life = t == p.life - p.ship_age
     survey = t >= p.survey_year and (t - p.survey_year) % 5 == 0 and not last_year_of_life
     days = p.earning_days - (p.drydock_days if survey else 0)
-    revenue = tce * days / 1e6
+    revenue = _tce(p, t) * (1 - p.commission) * days / 1e6
     opex = p.opex * 365 * (1 + p.opex_growth) ** (t - 1) / 1e6
     drydock = p.survey_cost if survey else 0.0
     return days, revenue, opex, drydock, revenue - opex - drydock - p.ets
 
 
 def sale_from_earnings(p: DCFInputs, rate: float) -> float:
-    """Value at the sale date of the cash a buyer can still earn: long-run TCE to the end of life, plus scrap."""
-    left = max(p.life - p.ship_age - p.hold, 0)
+    """Value at the sale date of the cash a buyer can still earn to the end of life, plus scrap."""
+    left = p.life - p.ship_age - p.hold
     if left == 0:
         return p.scrap
     total = 0.0
     for k in range(1, left + 1):
-        cash = _year(p, p.hold + k, p.tce_long_run, last_year_of_life=(k == left))[4]
+        cash = _year(p, p.hold + k)[4]
         total += (cash + (p.scrap if k == left else 0.0)) / (1 + rate) ** k
     return total
 
@@ -140,12 +150,14 @@ def irr(flows, lo=-0.9, hi=1.0) -> float:
 
 def value(p: DCFInputs, curve=None, rate: float = None) -> DCFResult:
     """Run the DCF. `curve` (an M1 AgeCurve) is needed only for exit_basis = "market"."""
+    if not 1 <= p.hold <= p.life - p.ship_age:
+        raise ValueError(f"hold must be 1 to {p.life - p.ship_age} years (economic life {p.life} - age {p.ship_age})")
     r = p.wacc if rate is None else rate
     sale = sale_from_earnings(p, r) if p.exit_basis == "earnings" else sale_from_curve(p, curve)
     rows, v, conv, wtce = [], 0.0, 0.0, 0.0
     for t in range(1, p.hold + 1):
-        tce = p.tce[t - 1] if t <= 3 else p.tce_long_run
-        days, rev, opx, dd, cash = _year(p, t, tce)
+        tce = _tce(p, t)
+        days, rev, opx, dd, cash = _year(p, t)
         df = 1 / (1 + r) ** t
         row = YearRow(t, p.ship_age + t, tce, days, rev, opx, dd, cash, sale if t == p.hold else 0.0, df)
         rows.append(row)
