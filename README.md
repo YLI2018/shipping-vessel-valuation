@@ -59,6 +59,8 @@ Leave-one-out validation fits the model on all other sales in the collected samp
 
 ![Value against the long-run TCE](docs/methodology/figures/dcf_longrun_tce.png)
 
+**How to read the chart.** The model assumes the ship earns **$16,000 a day from age 18 until it is scrapped at 25**. Nobody knows if that is right. So the chart asks: *if the ship earns a different amount per day, what is it worth today?* That daily amount, **L**, is the bottom axis; it is the number in the M2 workbook (M2_Valuation_Draft_v5.xlsx, sheet Inputs, cell B14, "Long-run earnings per day (TCE), year 4 onwards"). For each L the model is rerun: the dark line is the ship's worth today, the orange line the price it sells for at age 19. At $16,000 a day the ship is worth $23.12m; it reaches the $28.45m paid at $19,131 a day. Equations and a worked table: [M2 page](docs/methodology/m2_dcf.md#how-to-read-the-sensitivity-chart).
+
 Target Ship 1, valued on **22 May 2026** from the cash it can earn over five years plus its sale at the end, discounted at a 7.30% WACC.
 
 | Result | Value |
