@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from shipping_valuation.data.ingest import load_comparables
 from shipping_valuation.models.age_curve import fit_age_curve
-from shipping_valuation.models.dcf import load_inputs, value, breakeven_long_run_tce, sale_from_curve
+from shipping_valuation.models.dcf import load_inputs, value, breakeven_long_run_tce, sale_from_curve, scenarios
 
 
 class PublishedResults(unittest.TestCase):
@@ -43,6 +43,14 @@ class PublishedResults(unittest.TestCase):
         self.assertAlmostEqual(self.base.implied_tce, 23690, delta=1)
         self.assertAlmostEqual(self.base.irr, 0.0101, places=4)
         self.assertAlmostEqual(breakeven_long_run_tce(self.p), 19131, delta=2)
+
+    def test_scenarios(self):
+        """Bear / base / bull as in the M2 workbook (sheet Scenarios)."""
+        s = scenarios(self.p, self.curve)
+        self.assertAlmostEqual(s["bear"].result.value, 14.38, places=2)
+        self.assertAlmostEqual(s["base"].result.value, self.base.value, places=9)
+        self.assertAlmostEqual(s["bull"].result.value, 32.58, places=2)
+        self.assertAlmostEqual(s["bear"].tce_change, 11936 / 16000 - 1, places=9)
 
 
 class Behaviour(unittest.TestCase):
