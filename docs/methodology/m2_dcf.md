@@ -130,13 +130,58 @@ The long-run TCE sets both the earnings from year 4 and the sale price. Each $1,
 | Year 3 at $19,000 instead of $17,500 | 23.55 | +0.44 |
 | Sale at today's market (M1 curve) | 28.49 | +5.37 |
 | Discount rate +1 point | 22.11 | −1.01 |
-| Debt share 60%, beta re-levered to 1.60 (WACC 7.75%) | 22.66 | −0.46 |
+| Debt share 60%, beta re-levered to 1.53 (WACC 7.63%) | 22.78 | −0.34 |
 | Opex +10% | 20.73 | −2.39 |
 | Survey cost $2.48m | 22.04 | −1.08 |
 | EU ETS $0.5m a year (illustrative) | 19.42 | −3.69 |
 | Commission 2.5% of hire, every year to age 25 (sale price included) | 21.92 | −1.19 |
 | Economic life 22 years (scrapped at 22) | 20.63 | −2.48 |
 | Economic life 28 years | 23.65 | +0.53 |
+
+### Beta for a different debt share (the 60% debt test)
+
+**Why there is a test.** The discount rate uses the debt share of the eight companies the beta comes from: 18.4%. A real ship buyer borrows much more, typically about 50–65% of the price from a bank. So the model asks: *what if the buyer borrows 60%?* More debt makes the shareholders' risk higher, so the beta has to be changed for the test.
+
+**Two betas.**
+- **Beta with debt (levered): 0.75.** The risk the shareholders carry when the company has 18.4% debt. This is the beta in use (M2_Valuation_Draft_v5.xlsx, sheet Inputs, cell B38, "Equity beta – Damodaran sector figure").
+- **Beta without debt (unlevered).** The risk of the shipping business alone, as if it had no debt.
+
+**The equation (Hamada, no tax).** The risk of the business is shared between lenders and shareholders, in proportion to the money each puts in:
+
+    β business = Wd × β debt + (1 − Wd) × β shareholders        Wd = debt share
+
+Lenders receive fixed interest and are paid first, so β debt = 0. That leaves:
+
+    β without debt = (1 − Wd) × β with debt          (to remove debt)
+    β with debt    = β without debt ÷ (1 − Wd)       (to add debt)
+
+There is no tax in it because shipowners pay tonnage tax, a fixed charge per ship, so interest saves no tax. (The textbook version with tax is β with debt = β without debt × (1 + (1 − t) × D/E).)
+
+**Step 1. Remove the 18.4% debt already inside the 0.75.**
+
+    β without debt = (1 − 0.184) × 0.75 = 0.816 × 0.75 = 0.61
+    check: 0.61 ÷ (1 − 0.184) = 0.75
+
+**Step 2. Add the 60% debt being tested.**
+
+    β with debt = 0.61 ÷ (1 − 0.60) = 0.61 ÷ 0.40 = 1.53
+
+**Result at 60% debt.** Cost of equity = 4.56% + 1.53 × 4.24% = 11.05%; WACC = 40% × 11.05% + 60% × 5.35% = 7.63% (against 7.30%). The ship's worth today falls from $23.12m to $22.78m, **−$0.34m**. More debt makes equity riskier but brings in cheaper loan money, so the WACC changes little.
+
+**What was wrong before (fixed 14 November 2026).** The test skipped step 1. It took Damodaran's ready-made beta without debt, 0.64, which he worked out **with** a tax rate (about 24%), and then added the 60% debt back **without** tax. Down one equation and up a different one:
+
+| | Step 1: remove 18.4% debt | Step 2: add 60% debt | Effect on value |
+|---|---|---|---:|
+| Before | Damodaran's 0.64 (with tax) | 0.64 ÷ 0.40 = 1.60 (no tax) | −$0.46m |
+| Now | 0.75 × 0.816 = 0.61 (no tax) | 0.61 ÷ 0.40 = 1.53 (no tax) | −$0.34m |
+
+The mismatch is visible if you add the 18.4% debt back to Damodaran's 0.64 without tax: 0.64 ÷ 0.816 = 0.78, not the 0.75 in use.
+
+**What it changes.** Only the 60% "what if" test. The DCF value itself uses the 0.75 and the 18.4% directly, so it stays at $23.12m.
+
+**Where it is.** Workbook: M2_Valuation_Draft_v5.xlsx, sheet Source Data, rows S70 (beta without debt, 0.61), S71 (debt share tested, 60%) and S72 (beta at 60% debt, 1.53); the result is on sheet Start Here, row 45, and on the Caveats sheet. Code: `beta_without_debt` and `relevered()` in `src/shipping_valuation/models/dcf.py`.
+
+**Limit.** The 50–65% bank lending range is a market norm with no dated source in the model yet; 60% is a choice inside it.
 
 ## Scenarios: bear, base and bull
 
@@ -166,7 +211,7 @@ The main ones (full list in [limitations](../limitations.md)):
 
 - **No FFA curve.** Years 1–3 use one broker's time-charter estimates as a stand-in for forward freight prices, which need a paid subscription. Year 2 is derived from two quotes and is approximate; year 3 is a judgement.
 - **Long-run TCE is a judgement** from one listed owner's history, and it drives both the later earnings and the sale price.
-- **Discount rate** uses a sector beta from eight US firms, not tanker owners, and a sector debt share of 18%, against 50–65% on a typical ship loan. The re-levering test uses the no-tax formula, which at the base debt share gives a beta of 0.78 rather than the 0.75 used (−$0.13m). No tax is charged: shipowners pay tonnage tax, assumed immaterial.
+- **Discount rate** uses a sector beta from eight US firms, not tanker owners, and a sector debt share of 18%, against 50–65% on a typical ship loan. The 60% debt test changes the beta with one method, no tax both ways (see above). No tax is charged: shipowners pay tonnage tax, assumed immaterial.
 - **Nominal and flat figures are mixed:** opex grows 3.3% a year while TCE and the sale price are flat, which leans the value low.
 - **Gross hire:** commissions (1.25–5%) are not deducted.
 - **Lightweight** is a sister-design proxy; ±500 t moves scrap by about $0.23m.
