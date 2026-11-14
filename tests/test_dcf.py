@@ -52,8 +52,16 @@ class Behaviour(unittest.TestCase):
 
     def test_holding_period_does_not_change_value(self):
         """With the earnings-based sale the ship is worth its cash to the end of life, whoever owns it."""
-        v = [value(replace(self.p, hold=h)).value for h in (3, 5, 7)]
+        v = [value(replace(self.p, hold=h)).value for h in range(1, self.p.life - self.p.ship_age + 1)]
         self.assertAlmostEqual(min(v), max(v), places=9)
+
+    def test_hold_beyond_economic_life_is_rejected(self):
+        with self.assertRaises(ValueError):
+            value(replace(self.p, hold=self.p.life - self.p.ship_age + 1))
+
+    def test_commission_over_whole_life(self):
+        """2.5% commission off the hire in every year, the sale price included."""
+        self.assertAlmostEqual(value(replace(self.p, commission=0.025)).value, 25.589, places=3)
 
     def test_implied_tce_closes_the_gap(self):
         """Paying the implied TCE in every year of the hold (sale held) makes the value equal the price."""
