@@ -16,7 +16,7 @@ from shipping_valuation.models.dcf import load_inputs, value, breakeven_long_run
 
 
 class PublishedResults(unittest.TestCase):
-    """The figures on the M2 page (the same as the M2 v4 workbook, recalculated in Excel)."""
+    """The figures on the M2 page (the same as the M2 v5 workbook, recalculated in Excel)."""
 
     @classmethod
     def setUpClass(cls):
@@ -30,19 +30,19 @@ class PublishedResults(unittest.TestCase):
         self.assertAlmostEqual(self.p.wacc, 0.0730, places=4)
 
     def test_value_and_sale(self):
-        self.assertAlmostEqual(self.base.value, 26.875, places=3)
+        self.assertAlmostEqual(self.base.value, 23.115, places=3)
         self.assertAlmostEqual(self.base.sale, 11.490, places=3)
 
     def test_today_market_basis(self):
         m = value(replace(self.p, exit_basis="market"), curve=self.curve)
         self.assertAlmostEqual(sale_from_curve(self.p, self.curve), 19.132, places=3)
-        self.assertAlmostEqual(m.value, 32.247, places=3)
+        self.assertAlmostEqual(m.value, 28.488, places=3)
 
     def test_price_tests(self):
-        self.assertAlmostEqual(self.base.avg_tce, 22597, delta=1)
+        self.assertAlmostEqual(self.base.avg_tce, 19988, delta=1)
         self.assertAlmostEqual(self.base.implied_tce, 23690, delta=1)
-        self.assertAlmostEqual(self.base.irr, 0.0544, places=4)
-        self.assertAlmostEqual(breakeven_long_run_tce(self.p), 16925, delta=2)
+        self.assertAlmostEqual(self.base.irr, 0.0101, places=4)
+        self.assertAlmostEqual(breakeven_long_run_tce(self.p), 19131, delta=2)
 
 
 class Behaviour(unittest.TestCase):
@@ -61,7 +61,7 @@ class Behaviour(unittest.TestCase):
 
     def test_commission_over_whole_life(self):
         """2.5% commission off the hire in every year, the sale price included."""
-        self.assertAlmostEqual(value(replace(self.p, commission=0.025)).value, 25.589, places=3)
+        self.assertAlmostEqual(value(replace(self.p, commission=0.025)).value, 21.923, places=3)
 
     def test_implied_tce_closes_the_gap(self):
         """Paying the implied TCE in every year of the hold (sale held) makes the value equal the price."""
@@ -69,6 +69,10 @@ class Behaviour(unittest.TestCase):
         shift = b.implied_tce - b.avg_tce
         v = b.value + shift * b.converter
         self.assertAlmostEqual(v, self.p.price_tested, places=9)
+
+    def test_year2_from_one_and_two_year_quotes(self):
+        """The 2-year quote is the average of years 1 and 2: (30,000 + year 2) / 2 = 24,500."""
+        self.assertEqual(self.p.tce[1], 2 * 24500 - 30000)
 
     def test_value_rises_with_long_run_tce(self):
         lo = value(replace(self.p, tce_long_run=15000)).value
