@@ -65,11 +65,12 @@ rely on each result.
     owners; the debt share (18%) is far below a typical ship loan (50–65%). Re-levered at 60% debt the value falls $0.50m.
 27. **Nominal and flat figures mixed.** Opex grows 3.3% a year while TCE, the sale price and scrap are flat, which
     leans the value low.
-28. **Gross hire.** Address and brokerage commission (1.25–5%) is not deducted: 2.5% would lower the value by $0.81m.
+28. **Gross hire.** Address and brokerage commission (1.25–5%) is not deducted: 2.5% off the hire in every year to age 25 (the sale price included) would lower the value by $1.29m.
 29. **Charter quotes describe a standard MR.** The case ship is 14 years old and non-eco and may earn less; EU carbon
     cost is assumed to be carried by the charterer.
-30. **Scenarios and the implied TCE hold the sale value fixed**, so they understate how much earnings matter; the
-    long-run TCE chart on the M2 page shows the full effect.
+30. **The implied TCE holds the sale value fixed** (it changes earnings in the holding years only), so it understates
+    how much earnings matter. Every change in the M2 page's sensitivity table recalculates the sale price; the long-run
+    TCE chart shows the full effect.
 
 ## Use
 
