@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from shipping_valuation.data.ingest import load_comparables  # noqa: E402
 from shipping_valuation.models.age_curve import fit_age_curve  # noqa: E402
-from shipping_valuation.models.dcf import load_inputs, value, breakeven_long_run_tce, sale_from_curve  # noqa: E402
+from shipping_valuation.models.dcf import load_inputs, value, breakeven_long_run_tce, sale_from_curve, scenarios  # noqa: E402
 
 p = load_inputs(ROOT / "data" / "sample" / "dcf_inputs.json")
 _, ages, prices = load_comparables(ROOT / "data" / "sample" / "comparables.csv")
@@ -49,6 +49,11 @@ print("\nStep 5  Holding period does not change the value with the earnings-base
 for h in (3, 5, 7):
     print(f"        hold {h} years: ${value(replace(p, hold=h)).value:.2f}m")
 
+print("\nStep 6  Scenarios: earnings, discount rate and sale price moved together")
+for s in scenarios(p, curve).values():
+    print(f"        {s.name:4s}  earnings {s.tce_change:+.1%}  rate {s.rate:.2%}  sale {s.sale_change:+.1%}  "
+          f"value ${s.result.value:.2f}m  IRR at the price {s.result.irr:.1%}")
+
 # figure: what the ship is worth today for each level of long-run daily earnings
 xs = list(range(10000, 24001, 500))
 vals = [value(replace(p, tce_long_run=x)) for x in xs]
@@ -71,7 +76,7 @@ ax.annotate(f"Needed to justify the price paid:\n${be:,.0f}/day", (be, p.price_t
             arrowprops=dict(arrowstyle="->", color="#B03A2E", lw=0.8))
 ax.set_xlabel(f"Ship's earnings per day from age {p.ship_age + 4} to {p.life} (long-run TCE, $/day)")
 ax.set_ylabel("$ million")
-ax.set_title(f"What the ship is worth today, depending on its daily earnings from age {p.ship_age + 4}",
+ax.set_title(f"Sensitivity chart: what the ship is worth today, depending on its daily earnings from age {p.ship_age + 4}",
              fontsize=10, color="#0B3D5C")
 ax.xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
 ax.set_ylim(0, 40)
