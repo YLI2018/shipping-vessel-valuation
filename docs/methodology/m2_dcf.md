@@ -82,6 +82,43 @@ One consequence: with the earnings-based sale, the holding period does not chang
 
 ![Value and sale price against the long-run TCE](figures/dcf_longrun_tce.png)
 
+### How to read the sensitivity chart
+
+**The question.** The model assumes the ship earns **$16,000 a day from age 18 until it is scrapped at 25**. Nobody knows if that is right. So the chart asks: *if the ship earns a different amount per day, what is it worth today?*
+
+**The input it changes.** That daily amount is called **L** (long-run earnings, or long-run TCE). In the M2 workbook it is M2_Valuation_Draft_v5.xlsx, sheet Inputs, cell B14, the row "Long-run earnings per day (TCE), year 4 onwards" (value 16,000). In the code it is `tce_long_run` in `data/sample/dcf_inputs.json`. Everything else stays as in the base case.
+
+**What is plotted.** The model is rerun for each L from $10,000 to $24,000 a day. Each run gives two results, one point on each line:
+
+| Earnings per day from age 18 (L) | Sale price at age 19 (orange line) | Ship's worth today (dark line) |
+|---:|---:|---:|
+| $14,000 | $8.14m | $19.71m |
+| **$16,000 (model)** | **$11.49m** | **$23.12m** |
+| $18,000 | $14.84m | $26.52m |
+| **$19,131 (break-even)** | $16.74m | **$28.45m = price paid** |
+| $20,000 | $18.20m | $29.93m |
+
+The two horizontal lines do not depend on L: the price actually paid ($28.45m, dashed) and today's market price of a 19-year-old ship from M1 ($19.13m, dotted, for comparison).
+
+**The equations.** With r = 7.30% (the discount rate), opex = running cost, survey = $1.8m special survey at age 20, scrap = $4.74m at age 25:
+
+Orange line, the sale price at age 19 (what the next owner pays for ages 20–25):
+
+    S(L) = Σ (k = 1..6) [ L × days_k − opex_k − survey_k ] / (1 + r)^k  +  scrap / (1 + r)^6
+           days = 335 at age 20 (survey year), 360 otherwise
+
+Dark line, the ship's worth today:
+
+    V(L) = Σ (t = 1..3) cash_t / (1 + r)^t            years 1–3 (ages 15–17): $11.21m, does not depend on L
+         + Σ (t = 4..5) [ L × 360 − opex_t ] / (1 + r)^t   years 4–5 (ages 18–19)
+         + S(L) / (1 + r)^5                           the sale, brought back 5 years (× 0.703)
+
+**Why both lines rise, almost in parallel.** Each extra $1,000 a day raises the sale price by $1.68m (six more years of earnings for the next owner) and the worth today by $1.70m ($0.52m from years 4–5, plus $1.68m × 0.703 = $1.18m from the higher sale). The slopes are nearly equal, so the lines look parallel.
+
+**Why the dark line sits about $11.6m above the orange line.** At L = $16,000: worth today $23.12m − sale price $11.49m = $11.63m. That gap is the cash from years 1–3 ($11.21m) plus years 4–5 ($3.83m), less what the sale price loses by arriving five years later ($11.49m − $8.08m = $3.41m). Years 1–3 do not change with L, so the gap stays between $11.5m and $11.8m across the chart.
+
+**What it shows.** At the model's $16,000 a day the ship is worth $23.12m; the buyer paid $28.45m. The dark line reaches the price at **$19,131 a day** (the break-even). The price paid is justified only if the ship earns about $19,100 a day from age 18, not the $16,000 assumed.
+
 The long-run TCE sets both the earnings from year 4 and the sale price. Each $1,000 a day moves the value by about $1.7m: from $20.6m at the 2015–21 average ($14,547) to $30.3m at the 2015–25 average ($20,205).
 
 | Change, one at a time | DCF value ($m) | Change |
