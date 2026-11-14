@@ -64,8 +64,8 @@ rely on each result.
 25. **Sale price basis.** The default prices the sale from the earnings left; the alternative (M1 curve at the exit
     age) assumes today's high ship prices last and adds $5.37m. Both are reported.
 26. **Discount rate.** The beta is a sector figure from eight US firms (Damodaran, Shipbuilding & Marine), not tanker
-    owners; the debt share (18%) is far below a typical ship loan (50–65%). Re-levered at 60% debt the value falls $0.46m. The
-    re-levering uses the no-tax formula; applied to the base debt share it gives a beta of 0.78, not the 0.75 used (−$0.13m).
+    owners; the debt share (18%) is far below a typical ship loan (50–65%). At 60% debt (beta 0.75 → 0.61 without debt → 1.53,
+    no tax both ways) the value falls $0.34m. The 50–65% bank lending range has no dated source yet.
 27. **Nominal and flat figures mixed.** Opex grows 3.3% a year while TCE, the sale price and scrap are flat, which
     leans the value low.
 28. **Gross hire.** Address and brokerage commission (1.25–5%) is not deducted: 2.5% off the hire in every year to age 25 (the sale price included) would lower the value by $1.19m.
