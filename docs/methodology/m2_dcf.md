@@ -78,7 +78,7 @@ One consequence: with the earnings-based sale, the holding period does not chang
 
 **Reading.** The market (M1, $29.67m) prices the ship a little above the price paid. The DCF puts the price well above value in use ($5.33m): the buyer earns 1.0% a year rather than 7.3%, unless MR earnings settle about $3,100 a day above the long-run assumption, close to the 2015–25 average. The price is level with the DCF when the sale is valued at today's market ($28.49m). So the price is consistent with a view that today's strong market lasts, not with a normal market. Neither DCF basis is certain to be right; they show what the price is betting on.
 
-## The key assumption: long-run earnings
+## Sensitivity chart: long-run earnings and the break-even
 
 ![Value and sale price against the long-run TCE](figures/dcf_longrun_tce.png)
 
@@ -101,10 +101,27 @@ The long-run TCE sets both the earnings from year 4 and the sale price. Each $1,
 | Economic life 22 years (scrapped at 22) | 20.63 | −2.48 |
 | Economic life 28 years | 23.65 | +0.53 |
 
+## Scenarios: bear, base and bull
+
+The sensitivity table changes one input at a time. The scenarios move three together, as a weak or strong market would:
+
+| Lever | Bear | Base | Bull | How it is set |
+|---|---:|---:|---:|---|
+| Earnings, every year of the hold | −25.4% | 0% | +26.3% | Listed owner's three lowest years 2015–25 ($11,936) and its 2015–25 average ($20,205), against the long-run TCE ($16,000) |
+| Discount rate | 8.30% | 7.30% | 6.30% | ± 1 point |
+| Sale price at the end | −11.4% | 0% | +11.4% | The M1 curve's range (± one standard deviation) at today's age |
+| **Ship's worth today** | **$14.38m** | **$23.12m** | **$32.58m** | |
+| Against the price paid ($28.45m) | −49.4% | −18.8% | +14.5% | |
+| IRR if bought at the price | −9.4% | 1.0% | 10.9% | |
+
+**Reading.** The price paid sits between the base and bull cases: it needs a market closer to strong than to normal. In the bear case the buyer loses money.
+
+**Limit.** The sale price moves only by its own lever; it is not recalculated from the scenario earnings. Lower earnings would also lower the sale price, so the bear and bull values understate how far the value can move.
+
 ## Checks
 
 - The Python code reproduces the M2 workbook to the last decimal shown; the workbook was recalculated in Excel with no error cells.
-- Tests: published values, year 2 derived from the two quotes, the sale on both bases, IRR, implied TCE, break-even long-run TCE, holding-period invariance for every hold from 1 to 11 years, rejection of a hold past age 25, commission over the whole life, the implied-TCE identity and the re-levered WACC (`tests/test_dcf.py`).
+- Tests: published values, the bear / base / bull scenarios, year 2 derived from the two quotes, the sale on both bases, IRR, implied TCE, break-even long-run TCE, holding-period invariance for every hold from 1 to 11 years, rejection of a hold past age 25, commission over the whole life, the implied-TCE identity and the re-levered WACC (`tests/test_dcf.py`).
 
 ## Limitations
 
