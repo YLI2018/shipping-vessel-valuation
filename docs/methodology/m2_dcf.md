@@ -31,6 +31,29 @@ Discount rate r = WACC, from the capital asset pricing model (CAPM) for equity a
 
 All inputs with their sources: [`data/sample/dcf_inputs.json`](../../data/sample/dcf_inputs.json).
 
+### Where each input is in its source
+
+Page numbers are given where the document has them (annual reports and broker PDF reports). Web pages, spreadsheets and the one-page broker table have no page numbers, so the table, row and column are given instead.
+
+| Input | Value used | Document (date) | Where in it |
+|---|---:|---|---|
+| Earnings year 1; 2-year quote | $30,000; $24,500 a day | Broker weekly tanker time-charter estimates (13 May 2026) | One-page table: MR IMO3 row, 1-year and 2-year columns |
+| Long-run TCE (median 2015–25) and scenario levers | $16,000; $11,936; $20,205 a day | Listed MR owner (Ardmore Shipping): annual reports (20-F) and full-year results releases | 2015–17: 20-F FY2017 **p. 4**; 2018–19: 20-F FY2019 **p. 4**; 2020–25: results releases FY2021–FY2025, operating-data table |
+| Earning days | 360 | Same owner, 20-F FY2017 and FY2019 | **p. 4**, On-hire utilization row (99.30–99.90%) |
+| Opex and its growth | $7,654 a day; +3.3% a year | Same owner, results releases FY2024 and FY2025 | Operating-data table, vessel operating expenses per day |
+| Special survey cost | $1.8m | Same owner, 20-F FY2025 | **p. 18**: "between $1.3 million and $1.8 million" |
+| Dry-dock days; survey cost sensitivity | 25 days; $2.48m | Peer owner (Scorpio Tankers), 20-F FY2025 | **p. 77**: drydocks completed 2023–2025 (ships, days, cost) |
+| Economic life | 25 years | Ardmore 20-F FY2025; Scorpio 20-F FY2025 | Ardmore **p. 71**; Scorpio **p. F-18** |
+| Demolition price | $460 per ldt | Broker weekly market report (22 May 2026) | **p. 7**, demolition table, tankers, Bangladesh |
+| Newbuilding price (cost approach) | $50m | Broker weekly report (5 May 2026) | **p. 5**, indicative newbuilding prices, MR 50k |
+| Risk-free rate | 4.56% | US Treasury daily par yield curve (22 May 2026) | Web table: 22 May 2026 row, 10 Yr column |
+| Equity risk premium | 4.24% | Damodaran implied ERP, monthly (1 May 2026) | Spreadsheet: 1 May 2026 row |
+| Beta; debt-to-equity | 0.75; 22.55% | Damodaran betas by sector, US (January 2026) | Web table: Shipbuilding & Marine row |
+| SOFR | 3.55% | New York Fed SOFR page (22 May 2026) | Web table: 22 May 2026 row |
+| Loan margin | 1.80% | Ardmore 20-F FY2025 | **p. 70**: "SOFR plus a margin of 1.80%" |
+| Lightweight (sister design) | 10,310 t | Broker ship profile of a sister design | Web page: Dimensions/Tonnages |
+| Price tested | $28.45m | Sale report (7 July 2026, after the base date) | Used only as the price checked |
+
 ## Earnings in years 1–3
 
 The broker quotes two charters starting now: one year at $30,000 a day, and two years at $24,500 a day. A two-year charter pays one flat rate in both years, so $24,500 is the **average** of year 1 and year 2, not the rate for year 2:
