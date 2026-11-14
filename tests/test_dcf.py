@@ -89,9 +89,12 @@ class Behaviour(unittest.TestCase):
         self.assertLess(value(self.p).value, hi)
 
     def test_relevered_debt_share(self):
+        """One method both ways: 0.75 x (1 - 0.184) = 0.61 without debt; 0.61 / (1 - 0.60) = 1.53 at 60% debt."""
+        self.assertAlmostEqual(self.p.beta_without_debt, 0.612, places=3)
+        self.assertAlmostEqual(self.p.relevered(self.p.debt_share).beta, self.p.beta, places=12)
         q = self.p.relevered(0.6)
-        self.assertAlmostEqual(q.beta, 1.60, places=6)
-        self.assertAlmostEqual(q.wacc, 0.0775, places=4)
+        self.assertAlmostEqual(q.beta, 1.53, places=3)
+        self.assertAlmostEqual(q.wacc, 0.0763, places=4)
 
 
 if __name__ == "__main__":
