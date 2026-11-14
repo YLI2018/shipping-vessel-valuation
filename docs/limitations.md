@@ -52,7 +52,26 @@ rely on each result.
 22. **M1's error is the same at 22 May and at report-date prices** by construction (the same benchmark moves both its
     price and its prediction).
 
+## M2 discounted cash flow
+
+23. **No FFA curve.** Earnings for years 1–3 use one broker's weekly time-charter estimates (13 May 2026) as a stand-in
+    for forward freight agreement (FFA) prices, which need a paid subscription.
+24. **Long-run earnings are a judgement and drive the value twice.** The long-run TCE ($16,000 a day, one listed
+    owner's 2015–25 median) sets the earnings from year 4 and the earnings-based sale price. Each $1,000 a day moves the
+    value by about $1.7m; the price is matched at $16,925.
+25. **Sale price basis.** The default prices the sale from the earnings left; the alternative (M1 curve at the exit
+    age) assumes today's high ship prices last and adds $5.37m. Both are reported.
+26. **Discount rate.** The beta is a sector figure from eight US firms (Damodaran, Shipbuilding & Marine), not tanker
+    owners; the debt share (18%) is far below a typical ship loan (50–65%). Re-levered at 60% debt the value falls $0.50m.
+27. **Nominal and flat figures mixed.** Opex grows 3.3% a year while TCE, the sale price and scrap are flat, which
+    leans the value low.
+28. **Gross hire.** Address and brokerage commission (1.25–5%) is not deducted: 2.5% would lower the value by $0.81m.
+29. **Charter quotes describe a standard MR.** The case ship is 14 years old and non-eco and may earn less; EU carbon
+    cost is assumed to be carried by the charterer.
+30. **Scenarios and the implied TCE hold the sale value fixed**, so they understate how much earnings matter; the
+    long-run TCE chart on the M2 page shows the full effect.
+
 ## Use
 
-23. **Portfolio exercise.** The values are model estimates from public broker reports. They do not use inspection,
+31. **Portfolio exercise.** The values are model estimates from public broker reports. They do not use inspection,
     condition, class or charter records and are not investment advice.
