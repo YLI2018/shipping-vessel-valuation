@@ -23,5 +23,8 @@
   "beta_unlevered": {"value": 0.64, "source": "Same row, unlevered beta (for re-levering tests)"},
   "equity_risk_premium": {"value": 0.0424, "source": "Damodaran implied equity risk premium, 1 May 2026"},
   "cost_of_debt": {"value": 0.0535, "source": "SOFR 3.55% (22 May 2026) + 1.80% loan margin (Ardmore credit facility, July 2025); no tax (tonnage tax)"},
-  "debt_share": {"value": 0.184007, "source": "D/E 22.55% from the same Damodaran row: 22.55 / 122.55"}
+  "debt_share": {"value": 0.184007, "source": "D/E 22.55% from the same Damodaran row: 22.55 / 122.55"},
+  "tce_history_low3_usd_day": {"value": 11936, "source": "Scenario lever (bear): Ardmore MR TCE, average of its three lowest years 2015-2025 (2018, 2021, 2017)"},
+  "tce_history_avg_usd_day": {"value": 20205, "source": "Scenario lever (bull): Ardmore MR TCE, average 2015-2025"},
+  "scenario_rate_step": {"value": 0.01, "source": "Scenario lever: discount rate +/- 1 point"}
 }
