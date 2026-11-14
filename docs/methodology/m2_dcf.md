@@ -40,7 +40,7 @@ The holding period is five years, so the ship is sold at age 19. Two ways to pri
 
 **Why earnings is the default.** The cash forecast assumes earnings fall to $16,000 a day from year 4. A buyer at age 19 pays for the earnings then expected: $16,000 a day from age 20 to 25, less opex and one more special survey, plus scrap at 25, discounted to the sale date. The M1 curve gives what a 19-year-old sells for *today*, in a market paying about $30,000 a day for one year; using it would mix a weak-market cash forecast with a strong-market sale price. The two bases agree only if the long-run TCE is about $20,560 a day.
 
-One consequence: with the earnings-based sale, the holding period does not change the value (3, 5 or 7 years all give $26.87m). The ship is worth the cash it earns to age 25, whoever owns it.
+One consequence: with the earnings-based sale, the holding period does not change the value (every holding period from 1 to 11 years gives $26.87m). The ship is worth the cash it earns to age 25, whoever owns it.
 
 ## Case: Target Ship 1, 22 May 2026
 
@@ -84,12 +84,12 @@ The long-run TCE sets both the earnings from year 4 and the sale price. Each $1,
 | Opex +10% | 24.49 | −2.39 |
 | Survey cost $2.48m | 25.80 | −1.08 |
 | EU ETS $0.5m a year (illustrative) | 23.18 | −3.69 |
-| Commission 2.5% of hire | 26.06 | −0.81 |
+| Commission 2.5% of hire, every year to age 25 (sale price included) | 25.59 | −1.29 |
 
 ## Checks
 
 - The Python code reproduces the M2 workbook to the last decimal shown; the workbook was recalculated in Excel with no error cells.
-- Tests: published values, the sale on both bases, IRR, implied TCE, break-even long-run TCE, holding-period invariance, the implied-TCE identity and the re-levered WACC (`tests/test_dcf.py`).
+- Tests: published values, the sale on both bases, IRR, implied TCE, break-even long-run TCE, holding-period invariance for every hold from 1 to 11 years, rejection of a hold past age 25, commission over the whole life, the implied-TCE identity and the re-levered WACC (`tests/test_dcf.py`).
 
 ## Limitations
 
