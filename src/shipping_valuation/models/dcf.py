@@ -62,9 +62,16 @@ class DCFInputs:
     def scrap(self) -> float:
         return self.lightweight * self.demolition / 1e6
 
+    @property
+    def beta_without_debt(self) -> float:
+        """Beta in use with its debt removed, no tax: beta x (1 - debt share). 0.75 x (1 - 0.184) = 0.61."""
+        return self.beta * (1 - self.debt_share)
+
     def relevered(self, debt_share: float) -> "DCFInputs":
-        """Same inputs with a different debt share; beta re-levered: beta_U x (1 + D/E), no tax."""
-        return replace(self, debt_share=debt_share, beta=self.beta_unlevered * (1 + debt_share / (1 - debt_share)))
+        """Same inputs with a different debt share. Hamada equation, no tax (tonnage tax), both ways:
+        beta with debt = beta without debt / (1 - debt share). 0.61 / (1 - 0.60) = 1.53.
+        Starts from the beta in use, not Damodaran's unlevered beta (0.64), which he made with a tax rate."""
+        return replace(self, debt_share=debt_share, beta=self.beta_without_debt / (1 - debt_share))
 
 
 def load_inputs(path) -> DCFInputs:
