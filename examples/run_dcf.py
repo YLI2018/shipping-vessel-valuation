@@ -12,6 +12,7 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.ticker  # noqa: E402,F401
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -48,23 +49,32 @@ print("\nStep 5  Holding period does not change the value with the earnings-base
 for h in (3, 5, 7):
     print(f"        hold {h} years: ${value(replace(p, hold=h)).value:.2f}m")
 
-# figure: value and sale price against the long-run TCE
+# figure: what the ship is worth today for each level of long-run daily earnings
 xs = list(range(10000, 24001, 500))
 vals = [value(replace(p, tce_long_run=x)) for x in xs]
-fig, ax = plt.subplots(figsize=(7.5, 3.5))
-ax.plot(xs, [v.value for v in vals], color="#0B3D5C", lw=2, label="DCF value (sale from earnings)")
-ax.plot(xs, [v.sale for v in vals], color="#B87927", lw=1.6, label=f"Sale price at age {p.ship_age + p.hold}")
-ax.axhline(p.price_tested, color="black", ls="--", lw=1)
-ax.text(xs[0] + 100, p.price_tested + 0.6, f"price tested ${p.price_tested:.2f}m", fontsize=8)
+sale_age = p.ship_age + p.hold
+fig, ax = plt.subplots(figsize=(8, 4.2))
+ax.plot(xs, [v.value for v in vals], color="#0B3D5C", lw=2.2, label="Ship's worth today (DCF value)")
+ax.plot(xs, [v.sale for v in vals], color="#B87927", lw=1.8, label=f"Price the ship sells for at age {sale_age}, in {p.hold} years")
+ax.axhline(p.price_tested, color="black", ls="--", lw=1, label=f"Price actually paid for the ship: ${p.price_tested:.2f}m")
 m1_sale = sale_from_curve(p, curve)
-ax.axhline(m1_sale, color="#8A93A0", ls=":", lw=1)
-ax.text(xs[0] + 100, m1_sale + 0.6, f"M1 curve at age {p.ship_age + p.hold}: ${m1_sale:.2f}m", fontsize=8, color="#8A93A0")
-for x_, lab, c in [(p.tce_long_run, f"used: {p.tce_long_run:,.0f}", "#087F82"), (be, f"price needs: {be:,.0f}", "#B03A2E")]:
-    ax.axvline(x_, color=c, lw=1)
-    ax.text(x_ + 120, 2, lab, fontsize=8, color=c, rotation=90, va="bottom")
-ax.set_xlabel("Long-run TCE, year 4 onwards ($/day)")
-ax.set_ylabel("$m")
-ax.set_title("The long-run TCE sets both the later earnings and the sale price", fontsize=9.5, color="#0B3D5C")
+ax.axhline(m1_sale, color="#8A93A0", ls=":", lw=1.2,
+           label=f"Today's market price of a {sale_age}-year-old ship (M1): ${m1_sale:.2f}m")
+base = value(p)
+ax.plot([p.tce_long_run], [base.value], "o", color="#0B3D5C")
+ax.annotate(f"Assumed: ${p.tce_long_run:,.0f}/day\nworth ${base.value:.2f}m", (p.tce_long_run, base.value),
+            xytext=(11800, 24.2), fontsize=8.5, color="#0B3D5C",
+            arrowprops=dict(arrowstyle="->", color="#0B3D5C", lw=0.8))
+ax.plot([be], [p.price_tested], "o", color="#B03A2E")
+ax.annotate(f"Needed to justify the price paid:\n${be:,.0f}/day", (be, p.price_tested),
+            xytext=(20200, 9.5), fontsize=8.5, color="#B03A2E",
+            arrowprops=dict(arrowstyle="->", color="#B03A2E", lw=0.8))
+ax.set_xlabel(f"Ship's earnings per day from age {p.ship_age + 4} to {p.life} (long-run TCE, $/day)")
+ax.set_ylabel("$ million")
+ax.set_title(f"What the ship is worth today, depending on its daily earnings from age {p.ship_age + 4}",
+             fontsize=10, color="#0B3D5C")
+ax.xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
+ax.set_ylim(0, 40)
 ax.legend(frameon=False, fontsize=8, loc="upper left")
 ax.spines[["top", "right"]].set_visible(False)
 out = ROOT / "docs" / "methodology" / "figures" / "dcf_longrun_tce"
