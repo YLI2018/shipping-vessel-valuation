@@ -46,6 +46,9 @@ class DCFInputs:
     debt_share: float
     exit_basis: str = "earnings"  # "earnings" or "market"
     commission: float = 0.0       # share of hire lost to address and brokerage commission (0 = gross hire)
+    tce_history_low: float = None  # $/day, scenario lever: average of the listed owner's three lowest years
+    tce_history_avg: float = None  # $/day, scenario lever: the listed owner's long-run average
+    rate_step: float = 0.01        # scenario lever: discount rate +/- this
 
     @property
     def cost_of_equity(self) -> float:
@@ -74,7 +77,10 @@ def load_inputs(path) -> DCFInputs:
                      drydock_days=v("drydock_days"), ets=v("ets_musd_year"), hold=v("hold_years"),
                      life=v("economic_life_years"), lightweight=v("lightweight_t"), demolition=v("demolition_usd_ldt"),
                      risk_free=v("risk_free"), beta=v("beta"), beta_unlevered=v("beta_unlevered"),
-                     erp=v("equity_risk_premium"), cost_of_debt=v("cost_of_debt"), debt_share=v("debt_share"))
+                     erp=v("equity_risk_premium"), cost_of_debt=v("cost_of_debt"), debt_share=v("debt_share"),
+                     tce_history_low=j.get("tce_history_low3_usd_day", {}).get("value"),
+                     tce_history_avg=j.get("tce_history_avg_usd_day", {}).get("value"),
+                     rate_step=j.get("scenario_rate_step", {}).get("value", 0.01))
 
 
 @dataclass
@@ -148,16 +154,20 @@ def irr(flows, lo=-0.9, hi=1.0) -> float:
     return (lo + hi) / 2
 
 
-def value(p: DCFInputs, curve=None, rate: float = None) -> DCFResult:
-    """Run the DCF. `curve` (an M1 AgeCurve) is needed only for exit_basis = "market"."""
+def value(p: DCFInputs, curve=None, rate: float = None, tce_change: float = 0.0, sale: float = None) -> DCFResult:
+    """Run the DCF. `curve` (an M1 AgeCurve) is needed only for exit_basis = "market".
+    tce_change: earnings in every year of the hold x (1 + tce_change) (scenarios); sale: a fixed sale price instead."""
     if not 1 <= p.hold <= p.life - p.ship_age:
         raise ValueError(f"hold must be 1 to {p.life - p.ship_age} years (economic life {p.life} - age {p.ship_age})")
     r = p.wacc if rate is None else rate
-    sale = sale_from_earnings(p, r) if p.exit_basis == "earnings" else sale_from_curve(p, curve)
+    if sale is None:
+        sale = sale_from_earnings(p, r) if p.exit_basis == "earnings" else sale_from_curve(p, curve)
     rows, v, conv, wtce = [], 0.0, 0.0, 0.0
     for t in range(1, p.hold + 1):
-        tce = _tce(p, t)
+        tce = _tce(p, t) * (1 + tce_change)
         days, rev, opx, dd, cash = _year(p, t)
+        if tce_change:
+            rev, cash = rev * (1 + tce_change), cash + rev * tce_change
         df = 1 / (1 + r) ** t
         row = YearRow(t, p.ship_age + t, tce, days, rev, opx, dd, cash, sale if t == p.hold else 0.0, df)
         rows.append(row)
@@ -176,3 +186,34 @@ def breakeven_long_run_tce(p: DCFInputs, lo: float = 5000, hi: float = 60000) ->
         mid = (lo + hi) / 2
         lo, hi = (mid, hi) if value(replace(p, tce_long_run=mid)).value < p.price_tested else (lo, mid)
     return (lo + hi) / 2
+
+
+@dataclass
+class Scenario:
+    name: str
+    tce_change: float      # earnings in every year of the hold, change against the base case
+    rate: float            # discount rate
+    sale_change: float     # sale price at the end, change against the base sale price
+    result: DCFResult
+
+
+def scenarios(p: DCFInputs, curve) -> dict:
+    """Bear, base and bull: three levers moved together, as in the M2 workbook (sheet Scenarios).
+
+    Earnings, every year:  bear = the listed owner's three lowest years / long-run TCE - 1;
+                           bull = its long-run average / long-run TCE - 1.
+    Discount rate:         WACC + / - rate_step.
+    Sale price at the end: the base sale price x (1 -/+ M1 range / M1 value at today's age): the M1 curve's
+                           one-standard-deviation band. The sale price is not recalculated from the scenario
+                           earnings, so the range understates how far the value can move.
+    """
+    base = value(p, curve)
+    band = curve.sd / curve.value(p.ship_age)
+    levers = {"bear": (p.tce_history_low / p.tce_long_run - 1, p.wacc + p.rate_step, -band),
+              "base": (0.0, p.wacc, 0.0),
+              "bull": (p.tce_history_avg / p.tce_long_run - 1, p.wacc - p.rate_step, band)}
+    out = {}
+    for name, (tc, r, sc) in levers.items():
+        res = value(p, curve, rate=r, tce_change=tc, sale=base.sale * (1 + sc)) if name != "base" else base
+        out[name] = Scenario(name, tc, r, sc, res)
+    return out
