@@ -24,6 +24,12 @@ rely on each result.
 10. **Anonymised public data.** The CSVs carry no ship names or dates, only a report week (week 1 = week starting
     Monday 15 Dec 2025). The 22 May cutoff and the matching between files rest on the private database.
 
+**Checked: sales missed by the automated extractor.** The extractor read no sales from 8 Intermodal reports (older
+layout). Read by hand, they hold 11 MR tanker sales, all already in the data from other brokers, so M1 is complete.
+They also hold 10 bulker sales with an exact price that are not in the data. Adding them to M1+ model A (297 → 307
+sales) moves the Target Ship 1 value from US\$29.22m to US\$29.33m (+0.4%); the survey-due discount falls from −4.8% to
+−4.2%; other effects barely move; model B is unchanged. The published figures keep the 297 sales.
+
 ## Models
 
 11. **M1 uses age only.** Log price on age, after moving each price to the valuation date with a broker benchmark for
