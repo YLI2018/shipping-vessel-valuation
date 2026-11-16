@@ -94,7 +94,7 @@ One consequence: with the earnings-based sale, the holding period does not chang
 | DCF value, sale at today's market | $28.49m |
 | M1 market value (comparable sales) | $29.67m |
 | Price tested | $28.45m |
-| IRR at the price (before any loan; the sale price in it is itself a model result) | 1.0% a year, against 7.30% required |
+| Forecast IRR at the price (before any loan; the sale price in it is itself a model result) | 1.0% a year, against the 7.30% WACC |
 | Average TCE assumed (weighted by what each day is worth today) | $19,988 a day |
 | Implied TCE at the price (sale value held) | $23,690 a day |
 | **Long-run TCE at which value = price** | **$19,131 a day** (model: $16,000) |
@@ -217,7 +217,7 @@ The sensitivity table changes one input at a time. The scenarios move three toge
 | Sale price at the end | −11.4% | 0% | +11.4% | The M1 curve's range (± one standard deviation) at today's age |
 | **Ship's worth today** | **$14.38m** | **$23.12m** | **$32.58m** | |
 | Against the price paid ($28.45m) | −49.4% | −18.8% | +14.5% | |
-| IRR if bought at the price | −9.4% | 1.0% | 10.9% | |
+| Forecast IRR if bought at the price (before any loan) | −9.4% | 1.0% | 10.9% | compare with the discount rate in the same column |
 
 **Reading.** The price paid sits between the base and bull cases: it needs a market closer to strong than to normal. In the bear case the buyer loses money.
 
