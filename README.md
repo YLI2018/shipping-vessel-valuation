@@ -67,7 +67,7 @@ Target Ship 1, valued on **22 May 2026** from the cash it can earn over five yea
 |---|---:|
 | **DCF value** (sale priced from the earnings left) | **US\$23.12m** |
 | DCF value with the sale at today's market (M1 curve) | US\$28.49m |
-| Price tested US\$28.45m: IRR (before any loan) | 1.0% a year, against 7.30% required |
+| Price tested US\$28.45m: forecast IRR (before any loan) | 1.0% a year, against the 7.30% WACC |
 | Long-run earnings at which value = price | US\$19,131 a day (model: US\$16,000) |
 
 The long-run earnings assumption sets both the later cash and the sale price, so it is the key input: each US\$1,000 a day moves the value by about US\$1.7m. Year 1 uses the broker 1-year time-charter estimate; year 2 is derived from the 1- and 2-year estimates (the 2-year rate is the average of both years); year 3 is a judgement. They are not FFA prices.
