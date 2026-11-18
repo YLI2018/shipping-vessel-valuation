@@ -22,8 +22,11 @@ print(f"Equity IRR {d.equity_irr:.1%} vs cost of equity {d.cost_of_equity:.2%}; 
 print("Debt service cover, years 1-5:", ", ".join(f"{x:.2f}" for x in d.dscr), f"(minimum {f.min_dscr:.2f}x)")
 print(f"Value-rule headroom {d.min_headroom:.1%}; value can fall {d.max_fall:.1%}")
 m = max_bid(p, f)
-print(f"Bids: return {m.return_bid:.2f}, value rule {m.value_rule_bid:.1f}, debt service {m.dscr_bid:.1f} "
-      f"-> MAXIMUM BID ${m.max_bid:.2f}m (limited by {m.binding})")
+vr = "no limit up to the top of the grid" if m.value_rule_at_grid_top else f"{m.value_rule_bid:.1f}"
+print(f"Bids: return {m.return_bid:.2f}, value rule {vr}, debt service {m.dscr_bid:.1f} "
+      f"-> MAXIMUM BID ${m.max_bid:.2f}m (limited by {m.binding}); re-test: "
+      + ", ".join(f"{k} {'OK' if ok else 'FAIL'}" for k, ok in m.retest.items()))
+print("Debt service cover, years with a loan only; n/a = no IRR exists (the owners pay in at the sale)")
 
 print("\nEquity IRR: hire change (rows) x sale value change (columns)")
 cols = (-0.4, -0.2, 0.0, 0.2, 0.4)
