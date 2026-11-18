@@ -92,3 +92,6 @@ sales) moves the Target Ship 1 value from US\$29.22m to US\$29.33m (+0.4%); the 
 33. **One earnings forecast.** M3 uses M2's earnings and sale price; the long-run US$16,000 a day drives most of the result (see the sensitivity table on the M3 page).
 34. **Flat interest rate, no tax.** SOFR is held at its 22 May 2026 level; tonnage tax is assumed, so no tax is modelled.
 35. **Not reproduced in code.** The workbook's sale-and-leaseback comparison and monthly cash budget use placeholder terms and are not part of the published code.
+36. **Yearly model only in code.** The Python code reproduces the workbook's yearly model. The workbook's monthly cash budget (year 1, month-end balances, bank paid quarterly) is not reproduced; the yearly model pays the bank once a year, and year-1 interest differs by about US$34,000 between the two.
+37. **Grid limits.** The value-rule and debt-service bids are found on a US$0.5m price grid from US$18m to US$38m; a test that passes at US$38m shows that no limit was found inside the grid, not a measured maximum.
+38. **Exit value drives the result.** The sale price is priced from the earnings left at flat long-run hire while opex grows 3.32% a year. The sensitivity table moves hire in the years owned and the sale value separately; a combined case is not modelled.
