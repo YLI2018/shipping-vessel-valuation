@@ -67,4 +67,8 @@ The equity IRR reaches the 11.05% cost of equity only with hire about US\$4,000 
 
 ## IRR calculation
 
-The IRR is the rate at which the NPV of the cash flows is zero. The solver first checks that the flows contain both money out and money back, then widens its search beyond −90% to +100% as needed (for example −1 then +4 gives 300%) and returns *n/a* when no rate sets the NPV to zero. Where cash flows change sign more than once, more than one IRR can exist; the NPV and the money multiple are reported alongside.
+The IRR is the rate at which the NPV of the cash flows is zero. With x = 1/(1 + r) the NPV is a polynomial in x, so every IRR is found as a root of that polynomial (then polished). One root: that is the IRR (for example −1 then +4 gives 300%; −100, +200, −100 gives 0%, where the NPV only touches zero). No root: *no IRR exists*. Several roots (cash flows that change sign more than once, for example −100, +230, −132 has IRRs of 10% and 20%): the IRR is reported as *needs further analysis* and the NPV and the money multiple are used instead.
+
+## Input checks
+
+Before calculating, the code checks every input against the same allowed ranges as the workbook (for example loan-to-value 0–90%, repayment profile at least 1 year, holding period a whole number of 1–10 years that ends by the 25-year economic life, a price-grid step above 0) and stops with a message naming each input that is out of range.
