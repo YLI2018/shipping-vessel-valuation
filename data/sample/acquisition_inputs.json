@@ -1,0 +1,18 @@
+{
+  "_about": "M3 acquisition and finance inputs for Target Ship 1 on the base date 22 May 2026. Ship earnings, costs, sale price and discount rates come from dcf_inputs.json (M2). Loan terms marked 'Assumption' have no source for this deal and are subject to confirmation.",
+  "acquisition_costs": {"value": 0.005, "source": "Assumption: inspection, legal, delivery and registration, share of price"},
+  "working_capital_musd": {"value": 1.0, "source": "Assumption: cash put in on day 1, back at the sale"},
+  "sale_commission": {"value": 0.01, "source": "Assumption: broker commission paid by us as seller"},
+  "loan_to_value": {"value": 0.6, "source": "Assumption: 60% of the lower of price and value today"},
+  "repayment_profile_years": {"value": 10, "source": "Assumption: equal yearly repayments as if over 10 years; the rest is a balloon at the sale"},
+  "sofr": {"value": 0.0355, "source": "SOFR on 22 May 2026 (as M2)"},
+  "sofr_step": {"value": 0.0, "source": "Choice: flat, no forward curve"},
+  "loan_margin": {"value": 0.018, "source": "Listed MR owner (Ardmore Shipping) credit facility, July 2025; 20-F FY2025 p. 70 (as M2)"},
+  "arrangement_fee": {"value": 0.01, "source": "Assumption: share of the loan, paid at drawdown"},
+  "min_value_clause": {"value": 1.3, "source": "Assumption: ship value at least 130% of what we owe (typical 125-140%)"},
+  "min_dscr": {"value": 1.2, "source": "Assumption: assumed lender requirement, subject to confirmation"},
+  "m1_curve_a": {"value": 101.3176066331, "source": "Published M1 age curve, 43 MR sales reported by 22 May 2026"},
+  "m1_curve_b": {"value": -0.0877321162, "source": "Published M1 age curve"},
+  "grid_start_musd": {"value": 18.0, "source": "Choice: lowest price tested for the maximum bid"},
+  "grid_step_musd": {"value": 0.5, "source": "Choice: 41 prices, 18 to 38"}
+}
