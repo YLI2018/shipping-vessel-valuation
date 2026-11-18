@@ -2,7 +2,7 @@
 
 **Question.** Is buying Target Ship 1 at US\$28.45m good for the owners, can it be funded with a bank loan, and what is the most we should pay?
 
-M2 asks what the ship is worth. M3 starts from the same ship cash and the same sale price, and adds the price paid, the loan and the owners' cash. Code: `src/shipping_valuation/models/acquisition.py`; inputs: `data/sample/acquisition_inputs.json` plus M2's `dcf_inputs.json`; demo: `examples/run_acquisition.py`. The results agree with the M3 Excel workbook (v3, recalculated in Excel) to at least 3 decimal places.
+M2 asks what the ship is worth. M3 starts from the same ship cash and the same sale price, and adds the price paid, the loan and the owners' cash. Code: `src/shipping_valuation/models/acquisition.py`; inputs: `data/sample/acquisition_inputs.json` plus M2's `dcf_inputs.json`; demo: `examples/run_acquisition.py`. The code reproduces the workbook's **yearly** model (owners' cash, returns, bank tests, maximum bid, Table A) and agrees with the M3 Excel workbook (v3, recalculated in Excel) to at least 3 decimal places; the workbook's monthly cash budget, carbon module and sale-and-leaseback are not reproduced.
 
 ## Terms
 
@@ -21,7 +21,8 @@ M2 asks what the ship is worth. M3 starts from the same ship cash and the same s
 2. **Owners' cash.** Day 1: −28.45 × 1.005 − 1.0 working capital + 17.07 − 0.17 fee = −12.693. Each year: ship cash (as M2) − interest − repayment. Year 5 also: + sale 11.375 (after 1% commission) + 1.0 working capital − balloon 8.535.
 3. **Cost of equity.** Beta 0.75 (M2) without debt: 0.75 × (1 − 0.184) = 0.61; at our 60% loan: 0.61 ÷ 0.4 = 1.53; 4.56% + 1.53 × 4.24% = 11.05% (no tax both ways).
 4. **Bank tests.** Value rule: ship value ≥ 130% of what we owe, every year. Debt service cover ≥ 1.20× every year (the balloon is excluded). Both minimums are assumptions, subject to confirmation.
-5. **Maximum bid.** The deal is repeated at 41 prices (US\$18m–38m). Return bid: price where equity IRR = 11.05% (interpolated between grid prices). Value-rule bid and debt-service bid: highest grid price passing each test every year. **Maximum bid = the lowest of the three.**
+5. **Maximum bid.** The deal is repeated at 41 prices (US\$18m–38m). Return bid: the price where the owners' NPV at 11.05% is zero, so the equity IRR equals 11.05% exactly. Value-rule bid and debt-service bid: highest grid price passing each test every year; a test that passes at US\$38m means no limit was found inside the grid. **Maximum bid = the lowest of the three**, then the whole deal is re-run at that price and all three tests are checked again. Monthly liquidity is tested separately in the workbook and is not part of the bid.
+6. **No loan left.** In a year with no loan (no borrowing, or a loan repaid early) the debt service cover and the headroom are *not applicable*; the owners' cash and returns are still calculated.
 
 ## Results
 
@@ -38,14 +39,14 @@ M2 asks what the ship is worth. M3 starts from the same ship cash and the same s
 | Project IRR, no loan (WACC 7.30%) | 0.7% |
 | Debt service cover below 1.20× | years 4 and 5 (lowest 1.14×) |
 | Value-rule headroom / value can fall | 33.7% / 25.2% |
-| Bids: return / value rule / debt service | US\$22.22m / US\$38.0m (top of grid) / US\$27.0m |
-| **Maximum bid** | **US\$22.22m**, limited by the required return; US\$6.23m below the price tested |
+| Bids: return / value rule / debt service | US\$22.21m / no limit found up to US\$38m / US\$27.0m |
+| **Maximum bid** | **US\$22.21m**, limited by the required return; US\$6.24m below the price tested; re-test passes all three tests |
 
 **Why the deal fails.** The ship on its own earns 0.7% a year against the 7.30% WACC. The loan costs 5.35% plus fee, more than the ship earns, so borrowing turns 0.7% into −8.0% for the owners. Hire falls from US\$30,000 a day in year 1 to US\$16,000 from year 4, and the ship sells for US\$11.4m after five years against US\$28.45m paid. This is a result, not a model error.
 
 ## Sensitivities
 
-Equity IRR, hire change in every year owned (rows) × sale value change (columns). Middle box = base case. n/a: no return can be worked out because very little of the money put in comes back.
+Equity IRR, hire change in every year owned (rows) × sale value change (columns). Middle box = base case. n/a: no IRR exists – in the sale year the owners must pay money in, because the sale does not cover the loan still owed, so no rate makes the NPV zero (the NPV and the money multiple still apply).
 
 | Hire change | −40% | −20% | 0 | +20% | +40% |
 |---|---:|---:|---:|---:|---:|
@@ -63,3 +64,7 @@ The equity IRR reaches the 11.05% cost of equity only with hire about US\$4,000 
 - Earnings and the sale price are M2's single forecast; the long-run US\$16,000 a day drives most of the result.
 - SOFR is held flat; no tax; US dollars only.
 - The workbook also has a sale-and-leaseback comparison and a monthly cash budget; their terms are placeholders and are not reproduced here.
+
+## IRR calculation
+
+The IRR is the rate at which the NPV of the cash flows is zero. The solver first checks that the flows contain both money out and money back, then widens its search beyond −90% to +100% as needed (for example −1 then +4 gives 300%) and returns *n/a* when no rate sets the NPV to zero. Where cash flows change sign more than once, more than one IRR can exist; the NPV and the money multiple are reported alongside.
