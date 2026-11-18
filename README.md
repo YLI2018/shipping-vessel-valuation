@@ -5,7 +5,7 @@ vessel valuation methods.
 
 ## Project status
 
-Work in progress. Three models are published with their code, anonymised data and tests: the **M1 vessel age curve** and the **M1+ hedonic price model** (with technical notes), and the **M2 discounted cash flow model**.
+Work in progress. Four models are published with their code, anonymised data and tests. Part 1, valuation: the **M1 vessel age curve** and the **M1+ hedonic price model** (with technical notes), and the **M2 discounted cash flow model**. Part 2, investment and financing: the **M3 acquisition and finance model**.
 
 ## Models
 
@@ -14,7 +14,7 @@ Work in progress. Three models are published with their code, anonymised data an
 | [M1 Vessel age curve](docs/methodology/m1_age_curve.md) | What is a second-hand ship worth, from recent sales of similar ships? | Published |
 | [M1+ Hedonic price model](docs/methodology/m1plus_hedonic.md) | How do size, yard, survey timing and scrubbers move the price beyond age? | Published |
 | [M2 Discounted cash flow](docs/methodology/m2_dcf.md) | What is the ship worth from the cash it can earn, and what is a price betting on? | Published |
-| Financing and others | What does the owner earn after the loan? | Planned |
+| [M3 Acquisition and finance](docs/methodology/m3_acquisition.md) | Is the purchase good for the owners after the loan, do the bank's tests hold, and what is the most we should pay? | Published |
 
 ## M1 headline result
 
@@ -74,6 +74,22 @@ The long-run earnings assumption sets both the later cash and the sale price, so
 
 📄 [M2 page](docs/methodology/m2_dcf.md)
 
+## M3 headline result
+
+Target Ship 1 bought at the reported US\$28.45m with a 60% loan, held five years and sold. Same ship cash and sale price as M2.
+
+| Result | Value |
+|---|---:|
+| **Equity IRR** (owners' required return, cost of equity 11.05%) | **−8.0%** |
+| Project IRR before the loan (WACC 7.30%) | 0.7% |
+| Lowest debt service cover (assumed minimum 1.20×) | 1.14× in years 4 and 5 |
+| Bank's value-rule headroom | 33.7% (value can fall 25.2%) |
+| **Maximum bid** (lowest of return, value-rule and debt-service bids) | **US\$22.22m**, limited by the required return |
+
+The loan costs more than the ship earns, so borrowing lowers the owners' return. Loan terms are assumptions, not sourced terms for this deal.
+
+📄 [M3 page](docs/methodology/m3_acquisition.md)
+
 ## Research standards
 
 - Traceable data and clearly stated assumptions.
@@ -89,6 +105,7 @@ python3 -m pip install -r requirements.txt
 python3 examples/run_age_curve.py
 python3 examples/run_hedonic.py
 python3 examples/run_dcf.py
+python3 examples/run_acquisition.py
 python3 -m unittest discover -s tests
 ```
 
