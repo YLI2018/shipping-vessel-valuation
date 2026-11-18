@@ -16,8 +16,10 @@ the end of the hold.
 Bank tests:
     value rule       ship value_t >= minimum value clause x what we owe_t, every year 0 .. hold
     debt service     ship cash_t / (interest_t + scheduled repayment_t) >= minimum, every year (balloon excluded)
-Maximum bid = lowest of: the return bid (price where equity IRR = cost of equity, interpolated on the grid),
-the highest grid price keeping the value rule, the highest grid price keeping the debt service cover.
+Maximum bid = lowest of: the return bid (price where the owners' NPV at the cost of equity is zero, i.e. equity
+IRR = cost of equity), the highest grid price keeping the value rule, the highest grid price keeping the debt
+service cover. The deal is re-run at the maximum bid to confirm all three tests pass. A test that still passes at
+the top of the grid is flagged: no limit was found inside the grid. Monthly liquidity is not part of the bid.
 """
 import json
 import math
@@ -65,9 +67,9 @@ class DealResult:
     equity_in: float
     owners: list           # owners' cash, years 0 .. hold
     project: list          # ship cash with no loan, years 0 .. hold
-    dscr: list             # years 1 .. hold
-    headroom: list         # value rule, years 0 .. hold: (value / owed) / clause - 1
-    max_fall: float        # lowest 1 - owed x clause / value
+    dscr: list             # years 1 .. hold; None in a year with no debt service (no loan left)
+    headroom: list         # value rule, years 0 .. hold: (value / owed) / clause - 1; None when nothing is owed
+    max_fall: float        # lowest 1 - owed x clause / value; None if nothing is ever owed
     cost_of_equity: float
     equity_irr: float
     equity_npv: float
@@ -76,12 +78,16 @@ class DealResult:
     sale_net: float
 
     @property
-    def min_dscr(self) -> float:
-        return min(self.dscr)
+    def min_dscr(self):
+        """Lowest debt service cover over the years with debt service; None if there is no loan."""
+        x = [v for v in self.dscr if v is not None]
+        return min(x) if x else None
 
     @property
-    def min_headroom(self) -> float:
-        return min(self.headroom)
+    def min_headroom(self):
+        """Lowest value-rule headroom over the years a loan is owed; None if there is no loan."""
+        x = [v for v in self.headroom if v is not None]
+        return min(x) if x else None
 
 
 def _value(f: FinanceInputs, age: float) -> float:
@@ -112,12 +118,15 @@ def deal(p: DCFInputs, f: FinanceInputs, price: float = None) -> DealResult:
         end = sale_net + f.working_capital if t == hold else 0.0
         owners.append(cash - interest - rep - balloon + end)
         project.append(cash + end)
-        dscr.append(cash / (interest + rep))
+        dscr.append(cash / (interest + rep) if interest + rep > 0 else None)   # no loan left: not applicable
         owed.append(bal - rep)          # what we owe at the year end (the balloon is still owed in the sale year)
         bal = bal - rep - balloon
     head, falls = [], []
     for t, o in enumerate(owed):
         val = _value(f, p.ship_age + t)
+        if o <= 1e-12:                   # nothing owed this year: the bank's value rule does not apply
+            head.append(None)
+            continue
         head.append(val / o / f.min_value_clause - 1)
         falls.append(1 - o * f.min_value_clause / val)
     ke = cost_of_equity(p, f)
@@ -125,41 +134,60 @@ def deal(p: DCFInputs, f: FinanceInputs, price: float = None) -> DealResult:
     back = sum(c for c in owners[1:] if c > 0)
     out = -owners[0] - sum(c for c in owners[1:] if c < 0)
     return DealResult(price=price, loan=loan, equity_in=-owners[0], owners=owners, project=project, dscr=dscr,
-                      headroom=head, max_fall=min(falls), cost_of_equity=ke, equity_irr=irr(owners), equity_npv=npv,
+                      headroom=head, max_fall=min(falls) if falls else None, cost_of_equity=ke, equity_irr=irr(owners), equity_npv=npv,
                       multiple=back / out, project_irr=irr(project), sale_net=sale_net)
 
 
 @dataclass
 class MaxBid:
-    return_bid: float      # price where equity IRR = cost of equity (interpolated)
+    return_bid: float      # price where the owners' NPV at the cost of equity = 0 (equity IRR = cost of equity)
     value_rule_bid: float  # highest grid price keeping the value rule every year (None = none)
     dscr_bid: float        # highest grid price keeping the debt service cover every year (None = none)
     max_bid: float
     binding: str
+    value_rule_at_grid_top: bool = False   # True: passes even at the top of the grid, so no limit was found
+    dscr_at_grid_top: bool = False
+    retest: dict = None    # the deal re-run at the maximum bid: each test, passed or not
+
+
+def _return_bid(p: DCFInputs, f: FinanceInputs, grid):
+    """Price where the owners' NPV at the cost of equity is zero. NPV falls as the price rises, so the grid
+    brackets it; bisection on NPV (not IRR) gives the exact price."""
+    npv = lambda x: deal(p, f, x).equity_npv  # noqa: E731
+    vals = [npv(x) for x in grid]
+    if vals[0] < 0:
+        return None                      # no grid price earns the required return
+    if vals[-1] >= 0:
+        return grid[-1]                  # every grid price earns it: limited by the grid
+    k = max(i for i, v in enumerate(vals) if v >= 0)
+    lo, hi = grid[k], grid[k + 1]
+    for _ in range(100):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if npv(mid) >= 0 else (lo, mid)
+    return lo
 
 
 def max_bid(p: DCFInputs, f: FinanceInputs) -> MaxBid:
-    """Repeat the deal at grid prices (18, 18.5 .. 38) and take the lowest of the three bids, as the workbook does."""
+    """Repeat the deal at grid prices (18, 18.5 .. 38) and take the lowest of the three bids, as the workbook does;
+    then re-run the deal at that price and confirm every test passes."""
     grid = [f.grid_start + i * f.grid_step for i in range(f.grid_n)]
     deals = [deal(p, f, x) for x in grid]
-    ke = deals[0].cost_of_equity
-    k = sum(1 for d in deals if d.equity_irr >= ke)        # IRR falls as the price rises
-    if k == 0:
-        rb = None
-    elif k == len(grid):
-        rb = grid[-1]
-    else:
-        a, b = deals[k - 1].equity_irr, deals[k].equity_irr
-        rb = grid[k - 1] + (a - ke) / (a - b) * f.grid_step
-    ok_cov = [d.price for d in deals if d.min_headroom >= 0]
-    ok_dscr = [d.price for d in deals if d.min_dscr >= f.min_dscr]
+    rb = _return_bid(p, f, grid)
+    ok_cov = [d.price for d in deals if d.min_headroom is None or d.min_headroom >= 0]
+    ok_dscr = [d.price for d in deals if d.min_dscr is None or d.min_dscr >= f.min_dscr]
     vb, db = (max(ok_cov) if ok_cov else None), (max(ok_dscr) if ok_dscr else None)
+    top = dict(value_rule_at_grid_top=vb == grid[-1], dscr_at_grid_top=db == grid[-1])
     if rb is None or vb is None or db is None:
         return MaxBid(rb, vb, db, None, "no price passes " + ("the return" if rb is None else
-                                                               "the value rule" if vb is None else "debt service"))
+                                                               "the value rule" if vb is None else "debt service"),
+                      **top)
     m = min(rb, vb, db)
     binding = "return" if m == rb else "value rule" if m == vb else "debt service cover"
-    return MaxBid(rb, vb, db, m, binding)
+    d = deal(p, f, m)
+    retest = {"return": d.equity_npv >= -1e-9,
+              "value rule": d.min_headroom is None or d.min_headroom >= 0,
+              "debt service cover": d.min_dscr is None or d.min_dscr >= f.min_dscr}
+    return MaxBid(rb, vb, db, m, binding, retest=retest, **top)
 
 
 def sensitivity(p: DCFInputs, f: FinanceInputs, tce_change: float = 0.0, sale_change: float = 0.0,
@@ -187,8 +215,6 @@ def _with_sale(p: DCFInputs, f: FinanceInputs, sale_net: float) -> DealResult:
     npv = owners[0] + sum(c / (1 + ke) ** t for t, c in enumerate(owners) if t > 0)
     back = sum(c for c in owners[1:] if c > 0)
     out = -owners[0] - sum(c for c in owners[1:] if c < 0)
-    eq_irr = irr(owners)
-    if eq_irr <= -0.8999:   # no rate in range sets the NPV to 0: shown as n/a, as in the workbook
-        eq_irr = float("nan")
+    eq_irr = irr(owners)    # NaN when no IRR exists
     return replace(d, owners=owners, project=project, equity_irr=eq_irr, equity_npv=npv, multiple=back / out,
                    project_irr=irr(project), sale_net=sale_net)

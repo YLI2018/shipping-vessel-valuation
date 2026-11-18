@@ -152,13 +152,44 @@ class DCFResult:
     irr: float
 
 
-def irr(flows, lo=-0.9, hi=1.0) -> float:
-    """Rate at which the net present value of the flows is zero (bisection)."""
+def irr(flows) -> float:
+    """Rate at which the net present value of the flows is zero; NaN when no such rate exists.
+
+    No IRR exists unless the flows contain both money out and money back. The search starts at -99.99% and widens
+    the upper end (100%, 200%, 400% ...) until the NPV changes sign, then bisects. If the NPV never changes sign,
+    there is no IRR and NaN is returned (the caller shows "n/a"; NPV and the money multiple still apply).
+    Flows that change sign more than once can have more than one IRR: the lowest rate with NPV = 0 is returned
+    (use irr_unique to check)."""
+    if not (any(c > 0 for c in flows) and any(c < 0 for c in flows)):
+        return float("nan")
     npv = lambda r: sum(c / (1 + r) ** i for i, c in enumerate(flows))  # noqa: E731
+    lo, hi = -0.9999, 1.0
+    while npv(lo) * npv(hi) > 0 and hi < 1e6:
+        hi *= 2
+    if npv(lo) * npv(hi) > 0:
+        return float("nan")
+    # lowest root: scan from lo in small steps for the first sign change, then bisect inside it
+    grid = [lo + k * (hi - lo) / 2000 for k in range(2001)]
+    for a, b in zip(grid, grid[1:]):
+        if npv(a) == 0:
+            return a
+        if npv(a) * npv(b) < 0:
+            lo, hi = a, b
+            break
+    f_lo = npv(lo)
     for _ in range(200):
         mid = (lo + hi) / 2
-        lo, hi = (mid, hi) if npv(mid) > 0 else (lo, mid)
+        if npv(mid) * f_lo > 0:
+            lo, f_lo = mid, npv(mid)
+        else:
+            hi = mid
     return (lo + hi) / 2
+
+
+def irr_unique(flows) -> bool:
+    """True if the cash flows change sign once (money out, then money back): then the IRR, if any, is unique."""
+    signs = [c > 0 for c in flows if c != 0]
+    return sum(1 for a, b in zip(signs, signs[1:]) if a != b) <= 1
 
 
 def value(p: DCFInputs, curve=None, rate: float = None, tce_change: float = 0.0, sale: float = None) -> DCFResult:
