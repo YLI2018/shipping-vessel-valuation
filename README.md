@@ -84,7 +84,7 @@ Target Ship 1 bought at the reported US\$28.45m with a 60% loan, held five years
 | Project IRR before the loan (WACC 7.30%) | 0.7% |
 | Lowest debt service cover (assumed minimum 1.20×) | 1.14× in years 4 and 5 |
 | Bank's value-rule headroom | 33.7% (value can fall 25.2%) |
-| **Maximum bid** (lowest of return, value-rule and debt-service bids) | **US\$22.22m**, limited by the required return |
+| **Maximum bid** (lowest of return, value-rule and debt-service bids) | **US\$22.21m**, limited by the required return |
 
 The loan costs more than the ship earns, so borrowing lowers the owners' return. Loan terms are assumptions, not sourced terms for this deal.
 
