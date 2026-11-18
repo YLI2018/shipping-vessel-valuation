@@ -26,7 +26,7 @@ import math
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-from .dcf import DCFInputs, _year, irr, sale_from_earnings
+from .dcf import DCFInputs, _year, irr, irr_note, sale_from_earnings
 
 
 @dataclass(frozen=True)
@@ -76,6 +76,7 @@ class DealResult:
     multiple: float
     project_irr: float
     sale_net: float
+    equity_irr_note: str = ""   # why equity_irr is NaN: no IRR exists, or several IRRs exist
 
     @property
     def min_dscr(self):
@@ -99,8 +100,38 @@ def cost_of_equity(p: DCFInputs, f: FinanceInputs) -> float:
     return p.risk_free + p.beta_without_debt / (1 - f.ltv) * p.erp
 
 
+def validate(p: DCFInputs, f: FinanceInputs, price: float = None) -> None:
+    """Stop with a clear message before calculating if an input is outside its allowed range (as the workbook's
+    range checks on the Inputs sheet)."""
+    price = p.price_tested if price is None else price
+    life_left = p.life - p.ship_age
+    rules = [
+        (price > 0, f"price must be above 0 (got {price})"),
+        (isinstance(p.hold, int) and 1 <= p.hold <= 10, f"holding period must be a whole number of 1 to 10 years "
+                                                        f"(got {p.hold})"),
+        (p.hold <= life_left, f"holding period {p.hold} years goes past the economic life: the ship is "
+                              f"{p.ship_age} years old and the life is {p.life} years, so at most {life_left}"),
+        (0 <= f.ltv <= 0.9, f"loan-to-value must be 0% to 90% (got {f.ltv:.0%})"),
+        (f.repayment_years >= 1, f"repayment profile must be at least 1 year (got {f.repayment_years})"),
+        (0 <= f.acquisition_costs <= 0.1, f"acquisition costs must be 0% to 10% (got {f.acquisition_costs})"),
+        (f.working_capital >= 0, f"working capital must be 0 or more (got {f.working_capital})"),
+        (0 <= f.sale_commission <= 0.1, f"sale commission must be 0% to 10% (got {f.sale_commission})"),
+        (0 <= f.fee <= 0.05, f"arrangement fee must be 0% to 5% (got {f.fee})"),
+        (1 <= f.min_value_clause <= 2, f"minimum value clause must be 1.00 to 2.00 x the loan "
+                                       f"(got {f.min_value_clause})"),
+        (1 <= f.min_dscr <= 3, f"minimum debt service cover must be 1.00 to 3.00 x (got {f.min_dscr})"),
+        (f.grid_start > 0, f"price grid must start above 0 (got {f.grid_start})"),
+        (f.grid_step > 0, f"price grid step must be above 0 (got {f.grid_step})"),
+        (isinstance(f.grid_n, int) and f.grid_n >= 2, f"price grid needs at least 2 prices (got {f.grid_n})"),
+    ]
+    errors = [msg for ok, msg in rules if not ok]
+    if errors:
+        raise ValueError("M3 inputs outside their allowed range: " + "; ".join(errors))
+
+
 def deal(p: DCFInputs, f: FinanceInputs, price: float = None) -> DealResult:
     """Owners' cash, returns and bank tests at one price (default: the price tested)."""
+    validate(p, f, price)
     price = p.price_tested if price is None else price
     hold = p.hold
     loan = f.ltv * min(price, _value(f, p.ship_age))
@@ -135,7 +166,8 @@ def deal(p: DCFInputs, f: FinanceInputs, price: float = None) -> DealResult:
     out = -owners[0] - sum(c for c in owners[1:] if c < 0)
     return DealResult(price=price, loan=loan, equity_in=-owners[0], owners=owners, project=project, dscr=dscr,
                       headroom=head, max_fall=min(falls) if falls else None, cost_of_equity=ke, equity_irr=irr(owners), equity_npv=npv,
-                      multiple=back / out, project_irr=irr(project), sale_net=sale_net)
+                      multiple=back / out, project_irr=irr(project), sale_net=sale_net,
+                      equity_irr_note=irr_note(owners))
 
 
 @dataclass
@@ -170,6 +202,7 @@ def _return_bid(p: DCFInputs, f: FinanceInputs, grid):
 def max_bid(p: DCFInputs, f: FinanceInputs) -> MaxBid:
     """Repeat the deal at grid prices (18, 18.5 .. 38) and take the lowest of the three bids, as the workbook does;
     then re-run the deal at that price and confirm every test passes."""
+    validate(p, f)
     grid = [f.grid_start + i * f.grid_step for i in range(f.grid_n)]
     deals = [deal(p, f, x) for x in grid]
     rb = _return_bid(p, f, grid)
@@ -215,6 +248,6 @@ def _with_sale(p: DCFInputs, f: FinanceInputs, sale_net: float) -> DealResult:
     npv = owners[0] + sum(c / (1 + ke) ** t for t, c in enumerate(owners) if t > 0)
     back = sum(c for c in owners[1:] if c > 0)
     out = -owners[0] - sum(c for c in owners[1:] if c < 0)
-    eq_irr = irr(owners)    # NaN when no IRR exists
+    eq_irr = irr(owners)    # NaN when no single IRR exists (see the note)
     return replace(d, owners=owners, project=project, equity_irr=eq_irr, equity_npv=npv, multiple=back / out,
-                   project_irr=irr(project), sale_net=sale_net)
+                   project_irr=irr(project), sale_net=sale_net, equity_irr_note=irr_note(owners))

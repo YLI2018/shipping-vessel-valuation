@@ -152,38 +152,55 @@ class DCFResult:
     irr: float
 
 
-def irr(flows) -> float:
-    """Rate at which the net present value of the flows is zero; NaN when no such rate exists.
+def irr_roots(flows) -> list:
+    """Every rate r > -100% at which the NPV of the flows is zero, lowest first.
 
-    No IRR exists unless the flows contain both money out and money back. The search starts at -99.99% and widens
-    the upper end (100%, 200%, 400% ...) until the NPV changes sign, then bisects. If the NPV never changes sign,
-    there is no IRR and NaN is returned (the caller shows "n/a"; NPV and the money multiple still apply).
-    Flows that change sign more than once can have more than one IRR: the lowest rate with NPV = 0 is returned
-    (use irr_unique to check)."""
-    if not (any(c > 0 for c in flows) and any(c < 0 for c in flows)):
-        return float("nan")
-    npv = lambda r: sum(c / (1 + r) ** i for i, c in enumerate(flows))  # noqa: E731
-    lo, hi = -0.9999, 1.0
-    while npv(lo) * npv(hi) > 0 and hi < 1e6:
-        hi *= 2
-    if npv(lo) * npv(hi) > 0:
-        return float("nan")
-    # lowest root: scan from lo in small steps for the first sign change, then bisect inside it
-    grid = [lo + k * (hi - lo) / 2000 for k in range(2001)]
-    for a, b in zip(grid, grid[1:]):
-        if npv(a) == 0:
-            return a
-        if npv(a) * npv(b) < 0:
-            lo, hi = a, b
-            break
-    f_lo = npv(lo)
-    for _ in range(200):
-        mid = (lo + hi) / 2
-        if npv(mid) * f_lo > 0:
-            lo, f_lo = mid, npv(mid)
-        else:
-            hi = mid
-    return (lo + hi) / 2
+    With x = 1 / (1 + r) the NPV is a polynomial in x: c0 + c1 x + c2 x^2 + ... Its real positive roots give every
+    IRR, including the ones a search between two end points misses: two IRRs (-100, +230, -132: 10% and 20%) or an
+    IRR where the NPV only touches zero (-100, +200, -100: 0%). Each root is polished with Newton's method."""
+    import numpy as np
+    c = [float(v) for v in flows]
+    while c and c[-1] == 0:
+        c.pop()
+    if len(c) < 2 or not (any(v > 0 for v in c) and any(v < 0 for v in c)):
+        return []
+    npv = lambda r: sum(v / (1 + r) ** i for i, v in enumerate(c))  # noqa: E731
+    dnpv = lambda r: sum(-i * v / (1 + r) ** (i + 1) for i, v in enumerate(c))  # noqa: E731
+    scale = max(abs(v) for v in c)
+    out = []
+    for x in np.roots(c[::-1]):
+        if abs(x.imag) > 1e-6 * max(1.0, abs(x.real)) or x.real <= 0:
+            continue
+        r = 1 / x.real - 1
+        for _ in range(50):                      # Newton polish (slow but safe at a double root)
+            d = dnpv(r)
+            if d == 0:
+                break
+            step = npv(r) / d
+            if not (r - step > -1):
+                break
+            r -= step
+            if abs(step) < 1e-15:
+                break
+        if abs(npv(r)) <= 1e-7 * scale and not any(abs(r - o) < 1e-6 for o in out):
+            out.append(r)
+    return sorted(out)
+
+
+def irr(flows) -> float:
+    """The IRR when exactly one exists; NaN otherwise (use irr_note to say why)."""
+    roots = irr_roots(flows)
+    return roots[0] if len(roots) == 1 else float("nan")
+
+
+def irr_note(flows) -> str:
+    """'' when there is one IRR; otherwise why irr() returns NaN."""
+    n = len(irr_roots(flows))
+    if n == 1:
+        return ""
+    if n == 0:
+        return "no IRR exists (no rate makes the NPV zero)"
+    return f"{n} IRRs exist – needs further analysis (use the NPV and the money multiple)"
 
 
 def irr_unique(flows) -> bool:
