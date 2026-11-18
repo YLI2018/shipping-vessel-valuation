@@ -85,3 +85,10 @@ sales) moves the Target Ship 1 value from US\$29.22m to US\$29.33m (+0.4%); the 
 
 31. **Portfolio exercise.** The values are model estimates from public broker reports. They do not use inspection,
     condition, class or charter records and are not investment advice.
+
+## M3 acquisition and finance
+
+32. **Loan terms are assumptions.** Loan-to-value 60%, a 10-year repayment profile, a 1% fee, the 130% value rule and the 1.20× minimum debt service cover have no source for this deal; they are typical figures, subject to confirmation.
+33. **One earnings forecast.** M3 uses M2's earnings and sale price; the long-run US$16,000 a day drives most of the result (see the sensitivity table on the M3 page).
+34. **Flat interest rate, no tax.** SOFR is held at its 22 May 2026 level; tonnage tax is assumed, so no tax is modelled.
+35. **Not reproduced in code.** The workbook's sale-and-leaseback comparison and monthly cash budget use placeholder terms and are not part of the published code.
