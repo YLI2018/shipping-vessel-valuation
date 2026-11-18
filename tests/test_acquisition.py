@@ -13,8 +13,8 @@ sys.path.insert(0, str(ROOT / "src"))
 from shipping_valuation.models.dcf import load_inputs
 from dataclasses import replace
 
-from shipping_valuation.models.dcf import irr, irr_unique
-from shipping_valuation.models.acquisition import load_finance, deal, max_bid, sensitivity
+from shipping_valuation.models.dcf import irr, irr_unique, irr_roots, irr_note
+from shipping_valuation.models.acquisition import load_finance, deal, max_bid, sensitivity, validate
 
 
 class PublishedResults(unittest.TestCase):
@@ -83,6 +83,33 @@ class Behaviour(unittest.TestCase):
         self.assertTrue(irr_unique([-1, 2, 3]))
         self.assertFalse(irr_unique([-1, 3, -2]))
 
+    def test_several_or_touching_irrs(self):
+        """Second review: cash flows that change sign twice (expert's examples)."""
+        r = irr_roots([-100, 230, -132])
+        self.assertEqual(len(r), 2)
+        self.assertAlmostEqual(r[0], 0.10, places=9)
+        self.assertAlmostEqual(r[1], 0.20, places=9)
+        self.assertTrue(math.isnan(irr([-100, 230, -132])))               # not "no IRR": two IRRs
+        self.assertIn("2 IRRs exist", irr_note([-100, 230, -132]))
+        self.assertAlmostEqual(irr([-100, 200, -100]), 0.0, places=6)     # NPV only touches zero at 0%
+        self.assertEqual(irr_note([-1, 4]), "")
+        self.assertIn("no IRR exists", irr_note([-1, -1]))
+
+    def test_inputs_rejected_with_clear_messages(self):
+        bad = {"repayment years 0": dict(repayment_years=0), "LTV 100%": dict(ltv=1.0),
+               "grid step 0": dict(grid_step=0), "min DSCR 0": dict(min_dscr=0)}
+        for name, change in bad.items():
+            with self.subTest(name):
+                with self.assertRaises(ValueError) as e:
+                    deal(self.p, replace(self.f, **change))
+                self.assertIn("allowed range", str(e.exception))
+        with self.assertRaises(ValueError) as e:
+            deal(replace(self.p, hold=12), self.f)                         # sold at 26, life 25
+        self.assertIn("economic life", str(e.exception))
+        with self.assertRaises(ValueError):
+            max_bid(self.p, replace(self.f, grid_step=0))
+        validate(self.p, self.f)                                           # base case passes
+
     def test_no_loan(self):
         d = deal(self.p, replace(self.f, ltv=0))
         self.assertEqual(d.loan, 0)
@@ -104,6 +131,7 @@ class Behaviour(unittest.TestCase):
         d = sensitivity(self.p, self.f, sale_change=-0.4)
         self.assertLess(d.owners[-1], 0)                                 # sale does not cover the loan left
         self.assertTrue(math.isnan(d.equity_irr))
+        self.assertIn("no IRR exists", d.equity_irr_note)
         self.assertLess(d.multiple, 1)                                   # NPV and multiple still reported
 
     def test_no_price_passes_a_test(self):
